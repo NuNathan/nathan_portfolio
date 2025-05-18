@@ -1,0 +1,20 @@
+.animateBack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transform: translateY(0);
+  
+  transition:
+    background-color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+}
+
+.animateBack:hover {
+  background-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-0.25rem); /* same as -translate-y-1 */
+}

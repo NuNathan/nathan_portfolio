@@ -1,0 +1,39 @@
+.main {
+    font-size: 80px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    .top {
+        display: flex;
+    }
+    
+}
+
+/* font-size: 100px; */
+.text-gradient {
+    background: linear-gradient(
+        270deg,
+        #FFFFFF,
+        #FFFF00 ,
+        #8A2BE2 
+    );
+    background-size: 600% 600%;
+    animation: gradientShift 6s ease infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: 'Gugi', sans-serif;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
