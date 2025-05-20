@@ -1,24 +1,24 @@
-export default function ProjectSlide({right = true}) {
+export default function ProjectSlide({right = true, img = "", title = "", description = ""}) {
     return (
         <div className={right ? "flex gap-30" : "flex"}>
             {!right ? 
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNfWG6tDP4bS-WMe-IDOV1eSvmzREsDImDWw&s"/>
+                <img src={img}/>
             :
                 ""
             }
             
             <div>
-                <div>
-                    <span>
-                        Personal website
+                <div className="flex flex-col justify-center align-middle">
+                    <span className="text-right">
+                        {title}
                     </span>
-                    <span>
-                        iksdafjhdsla fdjskal fjds dks dkdsf dsfjkfds;ldf sdfjkdsfa;fdjkldf; fdsjfjfkf f fk fjdsak alks jdfksa sa ajskdfa ajfkfd s 
+                    <span className="text-right">
+                        {description}
                     </span>
                 </div>
             </div>
             {right ? 
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSNfWG6tDP4bS-WMe-IDOV1eSvmzREsDImDWw&s"/>
+                <img src={img}/>
             :
                 ""
             }

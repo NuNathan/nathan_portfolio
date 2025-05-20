@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useBouncingCircles } from "./CircleContext";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/navigation";
+import { normalize } from "path";
 
 interface Props {
     initialX?: number;
@@ -25,6 +26,8 @@ export default function Circle({
     text,
     hidden,
 }: Props) {
+    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z]/g, '');
+
     //decalre variables
     const { circles } = useBouncingCircles();
     const ref = useRef<HTMLSpanElement | null>(null);
@@ -35,7 +38,8 @@ export default function Circle({
         vx: speedIn * (Math.random() > 0.5 ? 1 : -1),
         vy: speedIn * (Math.random() > 0.5 ? 1 : -1),
     });
-    const [size, setSize] = useState(from == text.toLowerCase() ? 10000 : 0)
+    const [size, setSize] = useState(normalize(from ?? "") == text.toLowerCase() ? 10000 : 0)
+    console.log("HA", normalize(from ?? ""), " : ", normalize(text))
     let basicSize = useRef(0)
     let hoverSize = useRef(0)
     const clicked = useRef(false)
@@ -174,8 +178,7 @@ export default function Circle({
                 }
             }
 
-            self.style.left = `${pos.current.x}px`;
-            self.style.top = `${pos.current.y}px`;
+            self.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px)`;
             frameId = requestAnimationFrame(animate);
         };
 
@@ -202,27 +205,38 @@ export default function Circle({
     setSize(window.innerWidth*2)
     clicked.current = true
     setTimeout(() => {
-        router.push('/main/projects');
+        if(text.toLowerCase() == "projects") {
+            router.push('/main/projects');
+        } else if(text.toLowerCase() == "about me") {
+            router.push('/main/about-me');
+        } else if(text.toLowerCase() == "work experience") {
+            router.push('/main/projects');
+        }
     }, 250);
   }
 
   return (
     <span
         ref={ref}
-        className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full flex justify-center items-center transition-all duration-300 ease-out"
+        className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full flex justify-center items-center text-center leading-none transition-all duration-300 ease-out will-change-transform"
         style={{
             width: size,
             height: size,
             backgroundColor: colour,
-            left: pos.current.x,
-            top: pos.current.y,
         }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onClick={onClick}
         hidden={hidden}
     >
-        <span className="text-black">
+        <span
+            className="text-black"
+            style={{
+                fontFamily: 'Rubik Doodle Shadow',
+                fontSize: `${size / 8}px`,
+                transition: 'font-size 0.3s ease-out',
+            }}
+        >
             {!zoomed ? text : ""}
         </span>
     </span>

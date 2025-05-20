@@ -68,9 +68,9 @@ export default function Home() {
       />
       <BouncingCircleProvider>
         <div className="relative min-h-screen overflow-hidden">
-          <Circle initialX={100} initialY={200} colour="#DE4D86" text="Projects" from={from} hidden={hidden.projects}/>
-          <Circle initialX={800} initialY={400} colour="#F29CA3" text="About me" from={from} hidden={hidden.about}/>
-          <Circle initialX={1200} initialY={600} colour="#84E6F8" text="Work experience" from={from} hidden={hidden.experience}/>
+          <Circle initialX={100} initialY={200} colour="#FFB3BA" text="Projects" from={from} hidden={hidden.projects}/>
+          <Circle initialX={800} initialY={400} colour="#B5D3FF" text="About Me" from={from} hidden={hidden.about}/>
+          <Circle initialX={1200} initialY={600} colour="#C1F0B5" text="Work Experience" from={from} hidden={hidden.experience}/>
         </div>
       </BouncingCircleProvider>
       <Title mouseEnter={mouseEnter} mouseLeave={mouseLeave} hidden={hidden.title}/>

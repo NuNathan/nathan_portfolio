@@ -12,7 +12,7 @@ const DivWrapper = ({mouseEnter, mouseLeave, hidden}) => {
       <span
         className="text-8xl mb-6 block"
         style={{
-          color: '#F2EFC7',
+          color: 'black',
           fontFamily: 'Rubik Doodle Shadow',
           whiteSpace: 'normal',
           overflowWrap: 'break-word',
@@ -24,15 +24,12 @@ const DivWrapper = ({mouseEnter, mouseLeave, hidden}) => {
         className="relative inline-block overflow-hidden rounded-lg px-8 py-4 text-lg font-medium"
       >
         <span
-          className="text-gradient relative z-10 text-9xl text-white mt-[40px] inline-block"
+          className="text-gradient relative z-10 text-[140px] mt-[-30px] inline-block"
           onMouseEnter={mouseEnter}
           onMouseLeave={mouseLeave}
           style={{
-            // ...style,
-            // background: 'linear-gradient(90deg, #FF6B6B, #FFD700, #00FFC2)',
-            // WebkitBackgroundClip: 'text',
-            // WebkitTextFillColor: 'transparent',
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            fontFamily: 'Rubik Doodle Shadow'
           }}
         >
           Portfolio

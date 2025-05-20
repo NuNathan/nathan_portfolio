@@ -15,9 +15,9 @@
 .text-gradient {
     background: linear-gradient(
         270deg,
-        #FFFFFF,
-        #FFFF00 ,
-        #8A2BE2 
+        #FF3B30,
+        #FFB800,
+        #3A86FF
     );
     background-size: 600% 600%;
     animation: gradientShift 6s ease infinite;
