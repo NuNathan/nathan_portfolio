@@ -57,9 +57,9 @@ export default function TopNavigation({ className = '' }: TopNavigationProps) {
         />
       )}
 
-      <nav className={`fixed top-0 left-0 right-0 z-40 ${className}`}>
-        <div className="backdrop-blur-md bg-white/20 border-b border-white/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className={`fixed top-0 left-0 z-40 w-screen max-w-screen overflow-hidden ${className}`}>
+        <div className="w-full overflow-hidden backdrop-blur-md bg-white/20 border-b border-white/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
           <div className="flex justify-center items-center h-16 relative">
             {/* Logo/Brand - positioned absolutely to the left */}
             <div className="absolute left-0">

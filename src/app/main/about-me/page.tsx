@@ -42,7 +42,7 @@ export default async function AboutMe() {
                             {/* Profile image */}
                             <div className="w-full h-full overflow-hidden flex items-center justify-center">
                                 <img
-                                    src={aboutMeData?.headshot?.url ? `${process.env.STRAPI_URL || 'http://localhost:1337'}${aboutMeData.headshot.url}` : "https://headshots-inc.com/wp-content/uploads/2023/02/pure-white-background-for-professional-headshots-1.jpg"}
+                                    src={aboutMeData.headshot.url}
                                     className="w-full h-full object-cover rounded-3xl"
                                     alt={aboutMeData?.headshot?.alternativeText || "Headshot"}
                                 />
@@ -171,7 +171,7 @@ export default async function AboutMe() {
                         description="Download PDF"
                         buttonText="Download"
                         buttonBackground="#10b981"
-                        href={aboutMeData?.resume?.url ? `${process.env.STRAPI_URL}${aboutMeData.resume.url}` : '#'}
+                        href={aboutMeData.resume.url}
                         iconBackgroundColor="#10b981"
                     />
                 </div>

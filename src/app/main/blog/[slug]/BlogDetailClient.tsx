@@ -46,12 +46,13 @@ interface DetailedContent {
 
 interface BlogDetailClientProps {
   slug: string;
+  postData: PostData;
 }
 
 // Use PostData from API instead of separate interface
 type BlogItem = PostData;
 
-export default function BlogDetailClient({ slug }: BlogDetailClientProps) {
+export default function BlogDetailClient({ slug, postData }: BlogDetailClientProps) {
   const [content, setContent] = useState<DetailedContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,16 +68,7 @@ export default function BlogDetailClient({ slug }: BlogDetailClientProps) {
     const loadContent = async () => {
       // Load from API using window.location for baseUrl
       try {
-        console.log('[Client] Making client-side API call');
         setLoading(true);
-        const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-        const response = await fetch(`${baseUrl}/api/posts/${slug}`);
-
-        if (!response.ok) {
-          throw new Error('Content not found');
-        }
-
-        const postData = await response.json();
 
         const transformedContent: DetailedContent = {
           id: postData.id,

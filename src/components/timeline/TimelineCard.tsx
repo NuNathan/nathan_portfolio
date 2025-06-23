@@ -31,6 +31,12 @@ interface TimelineCardProps {
   placedCards: { item: any; top: number; left: number }[];
 }
 
+const placedCardPositions: {
+    start: Date;
+    top: number;
+    left: number;
+  }[] = [];
+
 export default function TimelineCard({ timelineMonth, allItems, timelineMonths, placedCards }: TimelineCardProps) {
   const now = new Date(); // Current date used for ongoing items
 
@@ -176,7 +182,14 @@ const itemsWithCardsThisMonth = activeItems.filter(item => {
   };
 
   // Get pre-calculated position for an item from placedCards
+
+  
+
   const getCardPosition = (item: any) => {
+    const cardWidth = 320;
+    const horizontalSpacing = 24;
+
+    console.log(placedCards)
     const placedCard = placedCards.find(pc =>
       pc.item.startDate === item.startDate &&
       pc.item.title === item.title &&
@@ -184,13 +197,51 @@ const itemsWithCardsThisMonth = activeItems.filter(item => {
       pc.item.school === item.school
     );
 
-    if (placedCard) {
-      return { horizontalOffset: placedCard.left, verticalOffset: placedCard.top };
+    const start = new Date(item.startDate);
+
+    const baseTop = placedCard?.top ?? -300;
+    let left = placedCard?.left ?? 0;
+
+    function areDatesWithinThreeMonths(date1: string | number | Date, date2: string | number | Date) {
+      const d1 = new Date(date1);
+      const d2 = new Date(date2);
+
+      const year1 = d1.getFullYear();
+      const month1 = d1.getMonth();
+
+      const year2 = d2.getFullYear();
+      const month2 = d2.getMonth();
+
+      const monthsApart = Math.abs((year2 - year1) * 12 + (month2 - month1));
+      return monthsApart <= 3;
     }
 
-    // Fallback to default position if not found (shouldn't happen)
-    return { horizontalOffset: 0, verticalOffset: -300 };
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const isOverlapping = placedCardPositions.some(prev => {
+        const within3Months = areDatesWithinThreeMonths(start, prev.start);
+        const horizontallyClose = Math.abs(prev.left - left) < cardWidth + horizontalSpacing;
+        const result = within3Months && horizontallyClose;
+        if (result) {
+          console.log("OVERLAP DETECTED between:", start, "and", prev.start, "| left:", left, "vs", prev.left);
+        } else {
+          console.log("NO OVERLAP between:", start, "and", prev.start, "| left:", left, "vs", prev.left);
+        }
+        return result;
+      });
+
+      if (!isOverlapping) break;
+      left += cardWidth + horizontalSpacing;
+    }
+
+    placedCardPositions.push({ start, top: baseTop, left });
+
+    return {
+      horizontalOffset: left,
+      verticalOffset: baseTop,
+    };
   };
+
+
 
 
 
@@ -350,14 +401,14 @@ const slotMap = getSlotAndColorAssignments(allItems);
             <svg
               className="absolute z-15 md:hidden"
               style={{
-                left: `${35 + slot * 6 + 4.5}px`, // Start from end of wider bar
-                top: `${cardPosition.verticalOffset + 80}px`, // Position to connect to card
-                width: `15px`, // Slightly longer connection
+                left: `${35 + slot * 6 + 4.5}px`, // start from the right edge of the mobile bar
+                top: `${cardPosition.verticalOffset + 80}px`,
+                width: `${(75 + cardPosition.horizontalOffset / 1.6) - (35 + slot * 6 + 4.5)}px`, // dynamic width to reach the card
                 height: '1px',
               }}
             >
               <path
-                d={`M 0 0.5 L 15 0.5`}
+                d={`M 0 0.5 L ${(75 + cardPosition.horizontalOffset / 1.6) - (35 + slot * 6 + 4.5)} 0.5`}
                 stroke={color}
                 strokeWidth="1"
                 fill="none"
@@ -428,7 +479,7 @@ const slotMap = getSlotAndColorAssignments(allItems);
             <div
               className="absolute z-20 md:hidden"
               style={{
-                left: `${55}px`, // Positioned after the repositioned bars
+                left: `${75 + (cardPosition.horizontalOffset/1.6)}px`, // Positioned after the repositioned bars
                 top: `${cardPosition.verticalOffset + 60}px`,
                 maxWidth: 'calc(100vw - 70px)', // Responsive to screen width
                 minWidth: '220px', // Slightly bigger minimum width
