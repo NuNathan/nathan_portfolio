@@ -3,31 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 import { useBouncingCircles } from "./CircleContext";
 import { v4 as uuidv4 } from "uuid";
-import { useRouter } from "next/navigation";
-import { normalize } from "path";
 
 interface Props {
     initialX?: number;
     initialY?: number;
-    from: null | string;
-    sizeIn?: number;
+    radius?: number;
     speedIn?: number;
-    colour?: string;
     text: string;
-    hidden: boolean;
 }
 
 export default function Circle({
     initialX = 100,
     initialY = 100,
-    from,
+    radius = 100,
     speedIn = 1,
-    colour = 'white',
     text,
-    hidden,
 }: Props) {
-    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z]/g, '');
-
     //decalre variables
     const { circles } = useBouncingCircles();
     const ref = useRef<HTMLSpanElement | null>(null);
@@ -38,40 +29,13 @@ export default function Circle({
         vx: speedIn * (Math.random() > 0.5 ? 1 : -1),
         vy: speedIn * (Math.random() > 0.5 ? 1 : -1),
     });
-    const [size, setSize] = useState(normalize(from ?? "") == text.toLowerCase() ? 10000 : 0)
-    console.log("HA", normalize(from ?? ""), " : ", normalize(text))
-    let basicSize = useRef(0)
-    let hoverSize = useRef(0)
-    const clicked = useRef(false)
-    const router = useRouter();
-    const [zoomed, setZoomed] = useState(from == text.toLowerCase())
+    const [size] = useState(radius * 2) // Fixed size based on radius
 
 
     // On Mount function:
     useEffect(() => {
         // Add self to context
         circles.current.push({ id: id.current, ref, pos: pos.current });
-        basicSize.current = window.innerHeight/2.5
-        hoverSize.current = window.innerHeight/2.5 * 1.2
-
-        if(from == text.toLowerCase()) {
-            setSize(window.innerWidth*2)
-            if(ref.current) {
-                ref.current.style.zIndex = "20"
-            }
-            
-            setTimeout(() => {
-                setSize(basicSize.current)
-                if(ref.current) {
-                    ref.current.style.zIndex = "0"
-                }
-                setZoomed(false)
-            }, 250);
-        }
-        else {
-            setSize(window.innerHeight/2.5)
-        } 
-        
 
         // On unmount, remove itself from context
         return () => {
@@ -86,7 +50,6 @@ export default function Circle({
         const animate = (time: number) => {
 
             const self = ref.current;
-            if(clicked.current) return
 
             // Throttle animation to 60fps
             const delta = Math.min((time - lastTime) / 16.67, 2) 
@@ -117,6 +80,8 @@ export default function Circle({
                 pos.current.vx = -Math.abs(pos.current.vx);
             }
 
+            // Allow circles to go behind the navigation bar (negative Y values)
+            // But bounce off the actual screen boundaries
             if (pos.current.y - radius < 0) {
                 pos.current.y = radius;
                 pos.current.vy = Math.abs(pos.current.vy);
@@ -186,34 +151,7 @@ export default function Circle({
         return () => cancelAnimationFrame(frameId);
     }, [size]);
 
-  const onMouseEnter = () => {
-    if(clicked.current) return
-    setSize(hoverSize.current)
-  }
 
-  const onMouseLeave = () => {
-    if(clicked.current) return
-    setSize(basicSize.current)
-  }
-
-  const onClick = () => {
-    circles.current = circles.current.filter(c => c.id !== id.current);
-    if(ref.current) {
-        ref.current.style.zIndex = "20"
-        ref.current.innerHTML = ""
-    }
-    setSize(window.innerWidth*2)
-    clicked.current = true
-    setTimeout(() => {
-        if(text.toLowerCase() == "projects") {
-            router.push('/main/projects');
-        } else if(text.toLowerCase() == "about me") {
-            router.push('/main/about-me');
-        } else if(text.toLowerCase() == "work experience") {
-            router.push('/main/projects');
-        }
-    }, 250);
-  }
 
   return (
     <span
@@ -222,22 +160,20 @@ export default function Circle({
         style={{
             width: size,
             height: size,
-            backgroundColor: colour,
+            background: 'linear-gradient(144deg,rgba(105, 116, 221, 1) 25%, #8c34e9 100%)',
+            pointerEvents: 'none',
         }}
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onClick={onClick}
-        hidden={hidden}
     >
         <span
-            className="text-black"
+            className="text-light"
             style={{
-                fontFamily: 'Rubik Doodle Shadow',
+                fontFamily: 'Open Sans',
+                fontWeight: '600',
                 fontSize: `${size / 8}px`,
                 transition: 'font-size 0.3s ease-out',
             }}
         >
-            {!zoomed ? text : ""}
+            {text}
         </span>
     </span>
   );

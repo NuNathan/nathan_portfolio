@@ -1,11 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Gugi&family=Rubik+Doodle+Shadow&display=swap');
-
 @import "tailwindcss";
 
-
 :root {
-  --background: #0f172a;
-  --foreground: #171717;
+  --background: #f6f9fc;
+  --foreground: #374252;
+  --gradient-primary: linear-gradient(135deg, #2b61eb 20%, #8e35ea 100%);
+  --gradient-title: linear-gradient(90deg,rgba(41, 98, 235, 1) 10%, rgba(147, 51, 234, 1) 50%, rgba(147, 51, 234, 1) 50%, rgba(41, 98, 235, 1) 90%);
+  --gradient-header: linear-gradient(144deg,rgba(119, 63, 234, 1) 0%, rgba(144, 52, 234, 1) 100%);
+  --color-dark-blue: #5d4bea;
+  --color-light: #f8f7fc;
+  --color-dark: #374252;
 }
 
 @theme inline {
@@ -15,19 +18,69 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground: black;
+/* Global gradient text utility */
+.text-gradient-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-title {
+  background: var(--gradient-title);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-header {
+  background: var(--gradient-header);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Global color utilities */
+.text-light {
+  color: var(--color-light);
+}
+
+.text-dark {
+  color: var(--color-dark);
+}
+
+.text-dark-blue {
+  color: var(--color-dark-blue);
+}
+
+.bg-light {
+  background-color: var(--color-light);
+}
+
+.bg-dark {
+  background-color: var(--color-dark);
+}
+
+/* Float animation for profile images */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
   }
 }
 
+.float-animation {
+  animation: float 4s ease-in-out infinite;
+}
+
 body {
-  background-image: url('/cardboard.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  cursor: url('/basic-cursor.png') 5 5, auto;/*cursor: none;*/
-  user-select: none;
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  cursor: url('/basic-cursor.png') 1 1, auto;
+  /* user-select: none; */
 }

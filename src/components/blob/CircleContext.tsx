@@ -5,8 +5,8 @@ import { createContext, useContext, useRef } from 'react';
 
 type Circle = {
   id: string;
-  ref: React.RefObject<HTMLSpanElement>;
-  pos: { x: number; y: number; xDir: number; yDir: number };
+  ref: React.RefObject<HTMLSpanElement | null>;
+  pos: { x: number; y: number; vx: number; vy: number };
 };
 
 const CircleContext = createContext<{

@@ -9,7 +9,7 @@ function toBorderRadiusString(values: number[]) {
   return `${values.slice(0, 4).map(v => `${v}%`).join(' ')} / ${values.slice(4).map(v => `${v}%`).join(' ')}`;
 }
 
-export default function ResizableBlob({ref}) {
+export default function ResizableBlob({ref}: {ref: any}) {
   const [radiusValues, setRadiusValues] = useState<number[] | null>(null);
   const targetsRef = useRef<number[]>([]);
   const directionsRef = useRef<number[]>([]);

@@ -8,32 +8,4 @@
     .top {
         display: flex;
     }
-    
-}
-
-/* font-size: 100px; */
-.text-gradient {
-    background: linear-gradient(
-        270deg,
-        #FF3B30,
-        #FFB800,
-        #3A86FF
-    );
-    background-size: 600% 600%;
-    animation: gradientShift 6s ease infinite;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-family: 'Gugi', sans-serif;
-}
-
-@keyframes gradientShift {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
 }
