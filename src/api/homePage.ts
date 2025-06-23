@@ -32,7 +32,7 @@ export interface HomePageData {
 
 export interface HomePageResponse {
   data: HomePageData;
-  meta: {};
+  meta: unknown;
 }
 
 export async function getHomePage(): Promise<HomePageResponse> {
