@@ -2,8 +2,8 @@ import BlogDetailClient from './BlogDetailClient';
 import { PostData } from '@/api/posts';
 
 export default async function BlogDetailPage(props: unknown) {
-  // @ts-ignore - treating unknown as any to extract params
-  const { slug } = await props.params;
+  
+  const { slug } = (props as { params: { slug: string } }).params;
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
