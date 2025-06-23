@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import SkillTag from "@/components/ui/SkillTag";
 import ProjectSlide from "@/components/project-slide/ProjectSlide";
 import { PostData } from "@/api/posts";
+import Image from 'next/image';
 
 //TODO: The rich text here does not support very much, this should be made better to have more available types
 
@@ -77,9 +78,9 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
           description: postData.description,
           img: postData.img,
           author: {
-            name: "Nathan Ramos",
-            title: "Software Engineer",
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face"
+            name: postData.author.name,
+            title: postData.author.title,
+            avatar: postData.author.avatar
           },
           tags: postData.tags || [],
           type: postData.type,
@@ -207,9 +208,11 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {/* Hero Image */}
           <div className="relative h-64 sm:h-80 md:h-96">
-            <img
+            <Image
               src={content.img}
               alt={content.title}
+              width={1080}
+              height={1920}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -251,10 +254,12 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
             {/* Author and Tags Section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 sm:mb-8">
               <div className="flex items-center gap-3 sm:gap-4 mb-4 md:mb-0">
-                <img
+                <Image
                   src={content.author.avatar}
+                  width={64}
+                  height={64}
                   alt={content.author.name}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                 />
                 <div>
                   <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{content.author.name}</h3>

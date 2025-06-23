@@ -10,13 +10,13 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
-  console.log(`[API] Fetching post with slug: ${slug}`);
-  console.log("SLUG")
 
   try {
     // Build Strapi query parameters
     const queryParams = new URLSearchParams();
-    queryParams.append('populate', '*');
+    queryParams.append('populate[skillTags]', 'true');
+    queryParams.append('populate[img]', 'true');
+    queryParams.append('populate[author][populate]', 'avatar');
     queryParams.append('filters[slug][$eq]', slug);
 
 
@@ -27,6 +27,7 @@ export async function GET(
     });
 
     const data = response.data;
+    console.log(JSON.stringify(data, null, 2));
     if (data.data && data.data.length > 0) {
       const post = data.data[0];
 
@@ -36,6 +37,13 @@ export async function GET(
         post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_PUBLIC_URL}${imgUrl}`;
       } else if (post.img && typeof post.img === 'string' && !post.img.startsWith('http')) {
         post.img = `${STRAPI_PUBLIC_URL}${post.img}`;
+      }
+
+      if (post.author?.avatar && typeof post.author.avatar === 'object' && post.author.avatar.url) {
+        const avatarUrl = post.author.avatar.url;
+        post.author.avatar = avatarUrl.startsWith('http')
+          ? avatarUrl
+          : `${STRAPI_PUBLIC_URL}${avatarUrl}`;
       }
 
       // Transform skillTags to tags with correct structure

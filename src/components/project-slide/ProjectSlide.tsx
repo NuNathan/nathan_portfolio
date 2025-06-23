@@ -2,6 +2,7 @@
 
 import SkillTag from "@/components/ui/SkillTag";
 import { useRouter, usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 interface ProjectSlideProps {
     title: string;
@@ -50,8 +51,10 @@ export default function ProjectSlide({
         >
             {/* Project Image */}
             <div className="relative h-48 overflow-hidden">
-                <img
+                <Image
                     src={img}
+                    width={640}
+                    height={640}
                     alt={title}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 />

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import { PostData, PostsResponse } from '@/api/posts';
+import { PostsResponse } from '@/api/posts';
 
 const STRAPI_PUBLIC_URL = process.env.STRAPI_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;

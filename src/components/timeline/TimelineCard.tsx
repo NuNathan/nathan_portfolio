@@ -189,7 +189,6 @@ const itemsWithCardsThisMonth = activeItems.filter(item => {
     const cardWidth = 320;
     const horizontalSpacing = 24;
 
-    console.log(placedCards)
     const placedCard = placedCards.find(pc =>
       pc.item.startDate === item.startDate &&
       pc.item.title === item.title &&
@@ -221,11 +220,6 @@ const itemsWithCardsThisMonth = activeItems.filter(item => {
         const within3Months = areDatesWithinThreeMonths(start, prev.start);
         const horizontallyClose = Math.abs(prev.left - left) < cardWidth + horizontalSpacing;
         const result = within3Months && horizontallyClose;
-        if (result) {
-          console.log("OVERLAP DETECTED between:", start, "and", prev.start, "| left:", left, "vs", prev.left);
-        } else {
-          console.log("NO OVERLAP between:", start, "and", prev.start, "| left:", left, "vs", prev.left);
-        }
         return result;
       });
 

@@ -3,6 +3,23 @@ import axios from 'axios';
 const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 
+type ExperienceItem = {
+  id: number;
+  type: 'job' | 'school';
+  startDate: string;
+  endDate: string | null;
+  current: boolean;
+  description: string;
+  content?: Array<{
+    title?: string;       // for job
+    company?: string;     // for job
+    location?: string;    // for job
+    school?: string;      // for school
+    degree?: string;      // for school
+    gpa?: number;         // for school
+  }>;
+};
+
 export async function getExperiences() {
   try {
     const response = await axios.get(`${STRAPI_URL}/experiences?populate=*`, {
@@ -13,7 +30,7 @@ export async function getExperiences() {
 
     // Transform the API data to match Timeline component expectations
     if (response.data?.data && Array.isArray(response.data.data)) {
-      const transformedExperiences = response.data.data.map((item: any) => {
+      const transformedExperiences = response.data.data.map((item: ExperienceItem) => {
         // Extract content based on type
         const content = item.content?.[0] || {};
 

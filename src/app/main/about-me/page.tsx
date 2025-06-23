@@ -1,6 +1,7 @@
 import { getAboutMe } from "@/api/aboutMe";
 import ContactCard from "@/components/ui/ContactCard";
 import SkillTag from "@/components/ui/SkillTag";
+import Image from 'next/image';
 
 interface SkillTag {
     id: number;
@@ -41,9 +42,11 @@ export default async function AboutMe() {
                         >
                             {/* Profile image */}
                             <div className="w-full h-full overflow-hidden flex items-center justify-center">
-                                <img
+                                <Image
                                     src={aboutMeData.headshot.url}
                                     className="w-full h-full object-cover rounded-3xl"
+                                    width={640}
+                                    height={640}
                                     alt={aboutMeData?.headshot?.alternativeText || "Headshot"}
                                 />
                             </div>

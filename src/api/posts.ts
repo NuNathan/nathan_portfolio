@@ -13,6 +13,7 @@ export interface PostLinks {
 }
 
 export interface PostData {
+  author: any;
   id: number;
   documentId: string;
   title: string;

@@ -1,5 +1,4 @@
 'use client';
-import { motion } from "framer-motion";
 import "./title.css";
 import CustomButton from "../ui/CustomButton";
 import { useRouter } from 'next/navigation';

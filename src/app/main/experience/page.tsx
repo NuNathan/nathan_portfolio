@@ -1,5 +1,4 @@
 import Timeline from "@/components/timeline/Timeline";
-import TechnicalSkills from "@/components/technical-skills/TechnicalSkills";
 import { getExperiences } from "@/api/experiences";
 // import experienceData from "@/data/experience.json";
 
