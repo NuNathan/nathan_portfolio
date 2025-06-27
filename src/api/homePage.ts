@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const STRAPI_PUBLIC_URL = process.env.STRAPI_URL;
+const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 
@@ -8,6 +8,7 @@ export interface SkillTag {
   id: number;
   skill: string;
   skillLevel: number;
+  mainColour: string;
 }
 
 export interface Resume {
@@ -46,7 +47,7 @@ export async function getHomePage(): Promise<HomePageResponse> {
     // Transform the response to include full URLs for file assets
     const data = response.data;
     if (data.data?.resume?.url && !data.data.resume.url.startsWith('http')) {
-      data.data.resume.url = `${STRAPI_PUBLIC_URL}${data.data.resume.url}`;
+      data.data.resume.url = `${STRAPI_MEDIA_URL}${data.data.resume.url}`;
     }
 
     return data;
@@ -74,11 +75,13 @@ export async function getHomePage(): Promise<HomePageResponse> {
             id: 1,
             skill: "React",
             skillLevel: 120,
+            mainColour: "#61dafb",
           },
           {
             id: 2,
             skill: "Vue",
             skillLevel: 90,
+            mainColour: "#4fc08d",
           },
         ],
       },

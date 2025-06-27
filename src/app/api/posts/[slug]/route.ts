@@ -1,9 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { strapiGet, isTimeoutError, isNetworkError } from '@/utils/api-client';
 import axios from 'axios';
 
-const STRAPI_PUBLIC_URL = process.env.STRAPI_URL;
+const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
+
+// Function to get author headshot from about-me data
+async function getAuthorHeadshot(): Promise<string | null> {
+  try {
+    const response = await axios.get(`${STRAPI_URL}/about-me?populate=headshot`, {
+      headers: {
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
+      },
+    });
+
+    const headshot = response.data?.data?.headshot;
+    if (headshot && headshot.url) {
+      return headshot.url.startsWith('http') ? headshot.url : `${STRAPI_MEDIA_URL}${headshot.url}`;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching author headshot:', error);
+    return null;
+  }
+}
 
 export async function GET(
   _request: NextRequest,
@@ -14,36 +35,36 @@ export async function GET(
   try {
     // Build Strapi query parameters
     const queryParams = new URLSearchParams();
-    queryParams.append('populate[skillTags]', 'true');
-    queryParams.append('populate[img]', 'true');
-    queryParams.append('populate[author][populate]', 'avatar');
+    queryParams.append('populate', '*'); // This will include content field and all other fields
     queryParams.append('filters[slug][$eq]', slug);
 
 
-    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-      },
-    });
+    const response = await strapiGet(`/posts?${queryParams.toString()}`);
 
     const data = response.data;
-    console.log(JSON.stringify(data, null, 2));
     if (data.data && data.data.length > 0) {
       const post = data.data[0];
 
       // Handle img object with url property
       if (post.img && typeof post.img === 'object' && post.img.url) {
         const imgUrl = post.img.url;
-        post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_PUBLIC_URL}${imgUrl}`;
+        post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_MEDIA_URL}${imgUrl}`;
       } else if (post.img && typeof post.img === 'string' && !post.img.startsWith('http')) {
-        post.img = `${STRAPI_PUBLIC_URL}${post.img}`;
+        post.img = `${STRAPI_MEDIA_URL}${post.img}`;
       }
 
-      if (post.author?.avatar && typeof post.author.avatar === 'object' && post.author.avatar.url) {
-        const avatarUrl = post.author.avatar.url;
-        post.author.avatar = avatarUrl.startsWith('http')
-          ? avatarUrl
-          : `${STRAPI_PUBLIC_URL}${avatarUrl}`;
+      // Handle author avatar
+      if (post.author) {
+        if (post.author.avatar && typeof post.author.avatar === 'object' && post.author.avatar.url) {
+          const avatarUrl = post.author.avatar.url;
+          post.author.avatar = avatarUrl.startsWith('http')
+            ? avatarUrl
+            : `${STRAPI_MEDIA_URL}${avatarUrl}`;
+        } else {
+          // If no avatar, try to get the headshot from about-me data
+          const headshot = await getAuthorHeadshot();
+          post.author.avatar = headshot || '';
+        }
       }
 
       // Transform skillTags to tags with correct structure
@@ -89,6 +110,14 @@ export async function GET(
     // If no data found in Strapi, fall through to fallback data
   } catch (error) {
     console.error('Error fetching post by slug:', error);
+
+    // Log specific error types for better debugging
+    if (isTimeoutError(error)) {
+      console.error('API request timed out - this may indicate slow Strapi response or network issues');
+    } else if (isNetworkError(error)) {
+      console.error('Network error - check Strapi server availability and network connectivity');
+    }
+
     // Fall through to fallback data
   }
 

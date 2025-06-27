@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
 import { PostsResponse } from '@/api/posts';
+import { strapiGet, isTimeoutError, isNetworkError } from '@/utils/api-client';
 
-const STRAPI_PUBLIC_URL = process.env.STRAPI_URL;
-const STRAPI_URL = process.env.STRAPI_API_URL;
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
+const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -81,11 +79,7 @@ export async function GET(request: NextRequest) {
       queryParams.append('filters[$or][1][description][$containsi]', searchTerm);
     }
 
-    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-      },
-    });
+    const response = await strapiGet(`/posts?${queryParams.toString()}`);
 
     // Transform the response to include full URLs for image assets
     const data = response.data;
@@ -94,9 +88,9 @@ export async function GET(request: NextRequest) {
         // Handle img object with url property
         if (post.img && typeof post.img === 'object' && post.img.url) {
           const imgUrl = post.img.url;
-          post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_PUBLIC_URL}${imgUrl}`;
+          post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_MEDIA_URL}${imgUrl}`;
         } else if (post.img && typeof post.img === 'string' && !post.img.startsWith('http')) {
-          post.img = `${STRAPI_PUBLIC_URL}${post.img}`;
+          post.img = `${STRAPI_MEDIA_URL}${post.img}`;
         }
 
         // Transform skillTags to tags with correct structure
@@ -165,6 +159,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching posts:', error);
+
+    // Log specific error types for better debugging
+    if (isTimeoutError(error)) {
+      console.error('API request timed out - this may indicate slow Strapi response or network issues');
+    } else if (isNetworkError(error)) {
+      console.error('Network error - check Strapi server availability and network connectivity');
+    }
 
     // Return empty data if API fails
     const emptyData: PostsResponse = {

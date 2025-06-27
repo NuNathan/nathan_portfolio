@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import SkillTag from "@/components/ui/SkillTag";
 import ProjectSlide from "@/components/project-slide/ProjectSlide";
+import RichTextRenderer from "@/components/ui/RichTextRenderer";
 import { PostData } from "@/api/posts";
 import Image from 'next/image';
 
-//TODO: The rich text here does not support very much, this should be made better to have more available types
+// Rich text renderer now supports full CKEditor output including all HTML elements
 
 interface DetailedContent {
   id: number;
@@ -31,11 +32,7 @@ interface DetailedContent {
     live?: string;
   };
   slug: string;
-  content: Array<{
-    type: string;
-    heading: string;
-    content: string;
-  }>;
+  content: string; // Rich text content from CKEditor
   relatedProjects: Array<{
     title: string;
     description: string;
@@ -89,13 +86,7 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
           readTime: postData.readTime,
           links: postData.links,
           slug: postData.slug || slug,
-          content: [
-            {
-              type: "text",
-              heading: "Overview",
-              content: postData.description + "\n\nThis is a detailed article about " + postData.title.toLowerCase() + ". The content would normally be stored in a rich text format and rendered here."
-            }
-          ],
+          content: postData.content || `<p>${postData.description}</p><p>This is a detailed article about ${postData.title.toLowerCase()}. The content would normally be stored in a rich text format and rendered here.</p>`,
           relatedProjects: []
         };
 
@@ -132,7 +123,9 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
         queryParams.append('filters[slug][$ne]', slug);
 
         // Fetch related posts from API
-        const response = await fetch(`/api/posts?${queryParams.toString()}`);
+        const response = await fetch(`/api/posts?${queryParams.toString()}`, {
+          signal: AbortSignal.timeout(20000), // 20 second timeout
+        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch related posts');
@@ -254,13 +247,19 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
             {/* Author and Tags Section */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 sm:mb-8">
               <div className="flex items-center gap-3 sm:gap-4 mb-4 md:mb-0">
-                <Image
-                  src={content.author.avatar}
-                  width={64}
-                  height={64}
-                  alt={content.author.name}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
-                />
+                {content.author.avatar && content.author.avatar.trim() !== '' ? (
+                  <Image
+                    src={content.author.avatar}
+                    width={64}
+                    height={64}
+                    alt={content.author.name}
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
+                    {content.author.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div>
                   <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{content.author.name}</h3>
                   <p className="text-gray-600 text-xs sm:text-sm">{content.author.title}</p>
@@ -282,51 +281,10 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
 
             {/* Article Content */}
             <div className="mb-8">
-              {content.content.map((section, index) => (
-                <div key={index} className="mb-8 last:mb-0">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    {section.heading}
-                  </h2>
-                  <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-                    {section.content.split('\n').map((paragraph, pIndex) => {
-                      if (paragraph.trim() === '') return null;
-
-                      // Handle code blocks
-                      if (paragraph.includes('```')) {
-                        return (
-                          <pre key={pIndex} className="bg-gray-100 p-4 rounded-lg overflow-x-auto my-4">
-                            <code>{paragraph.replace(/```\w*\n?/g, '').replace(/```/g, '')}</code>
-                          </pre>
-                        );
-                      }
-
-                      // Handle bullet points
-                      if (paragraph.startsWith('•')) {
-                        return (
-                          <li key={pIndex} className="ml-4 mb-2">
-                            {paragraph.substring(1).trim()}
-                          </li>
-                        );
-                      }
-
-                      // Handle bold text
-                      if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
-                        return (
-                          <h3 key={pIndex} className="text-lg font-semibold text-gray-900 mt-6 mb-2">
-                            {paragraph.replace(/\*\*/g, '')}
-                          </h3>
-                        );
-                      }
-
-                      return (
-                        <p key={pIndex} className="mb-4">
-                          {paragraph}
-                        </p>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+              <RichTextRenderer
+                content={content.content}
+                className="text-gray-700 leading-relaxed"
+              />
             </div>
 
             {/* Action Buttons for Projects */}

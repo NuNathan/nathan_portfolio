@@ -97,6 +97,7 @@ export default function HomeClient({ homePageData }: HomeClientProps) {
                 radius={scaledRadius}
                 text={skill.skill}
                 speedIn={circleProps.speedIn}
+                colour={skill.mainColour}
               />
             );
           })}

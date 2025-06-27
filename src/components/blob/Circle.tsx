@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useBouncingCircles } from "./CircleContext";
 import { v4 as uuidv4 } from "uuid";
+import { getComplementaryColor, toPastelColor } from "@/utils/colours";
 
 interface Props {
     initialX?: number;
@@ -10,6 +11,7 @@ interface Props {
     radius?: number;
     speedIn?: number;
     text: string;
+    colour?: string;
 }
 
 export default function Circle({
@@ -18,6 +20,7 @@ export default function Circle({
     radius = 100,
     speedIn = 1,
     text,
+    colour,
 }: Props) {
     //decalre variables
     const { circles } = useBouncingCircles();
@@ -160,7 +163,9 @@ export default function Circle({
         style={{
             width: size,
             height: size,
-            background: 'linear-gradient(144deg,rgba(105, 116, 221, 1) 25%, #8c34e9 100%)',
+            background: colour
+                ? `linear-gradient(144deg, ${colour} 25%, ${getComplementaryColor(colour)} 100%)`
+                : 'linear-gradient(144deg,rgba(105, 116, 221, 1) 25%, #8c34e9 100%)',
             pointerEvents: 'none',
         }}
     >
@@ -171,6 +176,7 @@ export default function Circle({
                 fontWeight: '600',
                 fontSize: `${size / 8}px`,
                 transition: 'font-size 0.3s ease-out',
+                color: `${toPastelColor(colour || '#FF746C')}`
             }}
         >
             {text}

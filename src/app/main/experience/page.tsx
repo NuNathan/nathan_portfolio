@@ -1,17 +1,52 @@
 import Timeline from "@/components/timeline/Timeline";
-import { getExperiences } from "@/api/experiences";
-// import experienceData from "@/data/experience.json";
+import { getExperiencePage } from "@/api/experiences";
+import TechnicalSkills from "@/components/technical-skills/TechnicalSkills";
 
 export default async function Experience() {
-
-  let experienceData = {experiences: []};
+  let pageData: {
+    subHeader: string;
+    experiences: Array<{
+      type: 'job' | 'school';
+      startDate: string;
+      endDate: string | null;
+      current: boolean;
+      description: string;
+      // Job-specific fields
+      title?: string;
+      company?: string;
+      location?: string;
+      // School-specific fields
+      school?: string;
+      degree?: string;
+      gpa?: string;
+    }>;
+    skillCategories: Array<{
+      category: string;
+      icon: string;
+      color: string;
+      skills: Array<{
+        id: number;
+        documentId: string;
+        skill: string;
+        mainColour: string;
+        skillLevel: number;
+        createdAt: string;
+        updatedAt: string;
+        publishedAt: string;
+      }>;
+    }>;
+  } = {
+    subHeader: "My professional journey through software development and education",
+    experiences: [],
+    skillCategories: []
+  };
 
   // We wrap only the data fetch, not the component render
   try {
-    experienceData = await getExperiences();
+    pageData = await getExperiencePage();
   } catch (error) {
-    console.error("Failed to fetch experience data:", error);
-    // Leave experienceData as default object with empty experiences array
+    console.error("Failed to fetch experience page data:", error);
+    // Leave pageData as default object with empty arrays
   }
 
   return (
@@ -20,15 +55,17 @@ export default async function Experience() {
         {/* Header Section */}
         <div className="text-center mb-12 sm:mb-16">
           <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
-            My professional journey through software development and education
+            {pageData.subHeader}
           </p>
         </div>
 
         {/* Timeline Section */}
-        <Timeline data={experienceData} />
+        <Timeline data={{ experiences: pageData.experiences }} />
 
-        {/* Technical Skills Section TODO*/}
-        {/* <TechnicalSkills /> */}
+        {/* Technical Skills Section - only render if we have skill categories */}
+        {pageData.skillCategories && pageData.skillCategories.length > 0 && (
+          <TechnicalSkills skillCategories={pageData.skillCategories} />
+        )}
       </div>
     </div>
   );

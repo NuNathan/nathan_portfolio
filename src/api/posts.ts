@@ -30,6 +30,7 @@ export interface PostData {
   publishedAt: string;
   createdAt: string;
   updatedAt: string;
+  content?: string; // Rich text content from CKEditor
 }
 
 export interface PostsResponse {
@@ -77,7 +78,9 @@ export async function getPosts(params: PostsQueryParams = {}): Promise<PostsResp
 
     queryParams.append('sortBy', sortBy);
 
-    const response = await fetch(`/api/posts?${queryParams.toString()}`);
+    const response = await fetch(`/api/posts?${queryParams.toString()}`, {
+      signal: AbortSignal.timeout(20000), // 20 second timeout
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

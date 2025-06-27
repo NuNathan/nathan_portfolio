@@ -1,24 +1,32 @@
-export default function TechnicalSkills() {
-  const skills = [
-    {
-      category: "Frontend",
-      icon: "💻",
-      color: "from-blue-500 to-cyan-500",
-      technologies: ["React", "TypeScript", "Next.js", "Tailwind CSS", "HTML5", "CSS3"]
-    },
-    {
-      category: "Backend",
-      icon: "⚙️",
-      color: "from-green-500 to-emerald-500",
-      technologies: ["Node.js", "Express", "Python", "Django", "PostgreSQL", "MongoDB"]
-    },
-    {
-      category: "Tools & Cloud",
-      icon: "🛠️",
-      color: "from-purple-500 to-pink-500",
-      technologies: ["AWS", "Docker", "Git", "GitHub", "VS Code", "Figma"]
-    }
-  ];
+import SkillTag from "@/components/ui/SkillTag";
+
+interface SkillData {
+  id: number;
+  documentId: string;
+  skill: string;
+  mainColour: string;
+  skillLevel: number;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+interface SkillCategory {
+  category: string;
+  icon: string;
+  color: string;
+  skills: SkillData[];
+}
+
+interface TechnicalSkillsProps {
+  skillCategories?: SkillCategory[];
+}
+
+export default function TechnicalSkills({ skillCategories }: TechnicalSkillsProps) {
+  // If no skillCategories provided or empty, don't render the component
+  if (!skillCategories || skillCategories.length === 0) {
+    return null;
+  }
 
   return (
     <div className="mt-20">
@@ -30,22 +38,23 @@ export default function TechnicalSkills() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {skills.map((skill, index) => (
+        {skillCategories.map((skillCategory, index) => (
           <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div className={`w-16 h-16 bg-gradient-to-r ${skill.color} rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto`}>
-              {skill.icon}
+            <div className={`w-16 h-16 bg-gradient-to-r ${skillCategory.color} rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto`}>
+              {skillCategory.icon}
             </div>
-            
-            <h3 className="text-xl font-bold text-gray-900 text-center mb-6">{skill.category}</h3>
-            
+
+            <h3 className="text-xl font-bold text-gray-900 text-center mb-6">{skillCategory.category}</h3>
+
             <div className="flex flex-wrap gap-2 justify-center">
-              {skill.technologies.map((tech, techIndex) => (
-                <span 
-                  key={techIndex}
-                  className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors duration-200"
-                >
-                  {tech}
-                </span>
+              {skillCategory.skills.map((skill) => (
+                <SkillTag
+                  key={skill.id}
+                  text={skill.skill}
+                  mainColour={skill.mainColour}
+                  variant="default"
+                  size="sm"
+                />
               ))}
             </div>
           </div>

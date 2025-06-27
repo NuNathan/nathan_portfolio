@@ -3,5 +3,10 @@
     "env": {
       "NEXT_DISABLE_ESLINT": "true"
     }
+  },
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
   }
 }
