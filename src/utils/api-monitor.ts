@@ -107,7 +107,7 @@ export async function monitoredFetch(
   retryCount: number = 0
 ): Promise<Response> {
   const monitor = ApiMonitor.getInstance();
-  const callId = monitor.startCall(url, options?.method || 'GET');
+  monitor.startCall(url, options?.method || 'GET');
   
   try {
     const response = await fetch(url, options);

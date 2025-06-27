@@ -54,7 +54,7 @@ type ExperiencePageResponse = {
     experiences: ExperienceItem[];
     skill_categories: SkillCategory[];
   };
-  meta: {};
+  meta: object;
 };
 
 export async function getExperiencePage() {

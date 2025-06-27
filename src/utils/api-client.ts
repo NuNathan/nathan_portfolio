@@ -51,7 +51,7 @@ export async function apiGet(url: string, config?: AxiosRequestConfig) {
   const mergedConfig = { ...defaultAxiosConfig, ...config };
 
   // Start monitoring
-  const callId = apiMonitor.startCall(url, 'GET');
+  apiMonitor.startCall(url, 'GET');
 
   try {
     const result = await retryRequest(() => axios.get(url, mergedConfig), 2, 1000, url);
