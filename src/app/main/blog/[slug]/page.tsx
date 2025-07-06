@@ -1,39 +1,119 @@
 import BlogDetailClient from './BlogDetailClient';
 import { PostData } from '@/api/posts';
 import { notFound } from 'next/navigation';
+import axios from 'axios';
 
-export default async function BlogDetailPage(props: unknown) {
+const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
+const STRAPI_URL = process.env.STRAPI_API_URL;
+const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 
-  const { slug } = await (props as { params: Promise<{ slug: string }> }).params;
-
-  // Use relative URL for server-side fetches to avoid port issues
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || (
-    typeof window === 'undefined'
-      ? 'http://localhost:3001'  // Server-side
-      : window.location.origin    // Client-side
-  );
-
+// Function to get author headshot from about-me data
+async function getAuthorHeadshot(): Promise<string | null> {
   try {
-    const response = await fetch(`${baseUrl}/api/posts/${slug}`, {
-      cache: 'no-store',
-      signal: AbortSignal.timeout(20000), // 20 second timeout for server-side fetch
+    const response = await axios.get(`${STRAPI_URL}/about-me?populate=headshot`, {
+      headers: {
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
+      },
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const headshot = response.data?.data?.headshot;
+    if (headshot && headshot.url) {
+      return headshot.url.startsWith('http') ? headshot.url : `${STRAPI_MEDIA_URL}${headshot.url}`;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching author headshot:', error);
+    return null;
+  }
+}
+
+export default async function BlogDetailPage(props: unknown) {
+  const { slug } = await (props as { params: Promise<{ slug: string }> }).params;
+
+  try {
+    // Call Strapi directly from server-side instead of going through Next.js API route
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', '*'); // This will include content field and all other fields
+    queryParams.append('filters[slug][$eq]', slug);
+
+    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
+      },
+      timeout: 20000, // 20 second timeout
+    });
+
+    const data = response.data;
+    if (data.data && data.data.length > 0) {
+      const post = data.data[0];
+
+      // Handle img object with url property
+      if (post.img && typeof post.img === 'object' && post.img.url) {
+        const imgUrl = post.img.url;
+        post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_MEDIA_URL}${imgUrl}`;
+      } else if (post.img && typeof post.img === 'string' && !post.img.startsWith('http')) {
+        post.img = `${STRAPI_MEDIA_URL}${post.img}`;
+      }
+
+      // Handle author avatar
+      if (post.author) {
+        if (post.author.avatar && typeof post.author.avatar === 'object' && post.author.avatar.url) {
+          const avatarUrl = post.author.avatar.url;
+          post.author.avatar = avatarUrl.startsWith('http')
+            ? avatarUrl
+            : `${STRAPI_MEDIA_URL}${avatarUrl}`;
+        } else {
+          // If no avatar, try to get the headshot from about-me data
+          const headshot = await getAuthorHeadshot();
+          post.author.avatar = headshot || '';
+        }
+      }
+
+      // Transform skillTags to tags with correct structure
+      if (post.skillTags && Array.isArray(post.skillTags)) {
+        post.tags = post.skillTags.map((skillTag: any) => ({
+          id: skillTag.id,
+          text: skillTag.skill,
+          color: skillTag.mainColour
+        }));
+        delete post.skillTags; // Remove original field
+      } else {
+        post.tags = []; // Ensure tags is always an array
+      }
+
+      // Transform demo/github/live fields to links object
+      post.links = {
+        demo: post.demo || undefined,
+        github: post.github || undefined,
+        live: post.live || undefined
+      };
+
+      // Clean up original fields
+      delete post.demo;
+      delete post.github;
+      delete post.live;
+
+      // Ensure date field is properly formatted
+      if (post.completionDate) {
+        const date = new Date(post.completionDate);
+        post.date = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+      }
+
+      // Ensure views field is properly handled
+      post.views = post.views || 0;
+
+      const postData: PostData = post;
+      return <BlogDetailClient slug={slug} postData={postData} />;
     }
 
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error('Response is not JSON');
-    }
-
-    const postData: PostData = await response.json();
-
-    return <BlogDetailClient slug={slug} postData={postData} />;
+    // If no data found, return 404
+    notFound();
   } catch (error) {
     console.error('Error fetching post:', error);
-
     // Return 404 for missing posts instead of fallback data
     notFound();
   }

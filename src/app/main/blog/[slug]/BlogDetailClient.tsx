@@ -51,9 +51,6 @@ interface BlogDetailClientProps {
 type BlogItem = PostData;
 
 export default function BlogDetailClient({ slug, postData }: BlogDetailClientProps) {
-  const [content, setContent] = useState<DetailedContent | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [relatedItems, setRelatedItems] = useState<BlogItem[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -62,48 +59,34 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
   const source = searchParams.get('from') || 'blog';
   const breadcrumbText = source === 'projects' ? 'Projects' : 'Blog';
 
+  // Transform postData to DetailedContent format
+  const content: DetailedContent = {
+    id: postData.id,
+    title: postData.title,
+    subtitle: postData.description,
+    description: postData.description,
+    img: postData.img,
+    author: {
+      name: postData.author.name,
+      title: postData.author.title,
+      avatar: postData.author.avatar
+    },
+    tags: postData.tags || [],
+    type: postData.type,
+    date: postData.date,
+    views: postData.views,
+    readTime: postData.readTime,
+    links: postData.links,
+    slug: postData.slug || slug,
+    content: postData.content || `<p>${postData.description}</p><p>This is a detailed article about ${postData.title.toLowerCase()}. The content would normally be stored in a rich text format and rendered here.</p>`,
+    relatedProjects: []
+  };
+
   useEffect(() => {
-    const loadContent = async () => {
-      // Load from API using window.location for baseUrl
-      try {
-        setLoading(true);
-
-        const transformedContent: DetailedContent = {
-          id: postData.id,
-          title: postData.title,
-          subtitle: postData.description,
-          description: postData.description,
-          img: postData.img,
-          author: {
-            name: postData.author.name,
-            title: postData.author.title,
-            avatar: postData.author.avatar
-          },
-          tags: postData.tags || [],
-          type: postData.type,
-          date: postData.date,
-          views: postData.views,
-          readTime: postData.readTime,
-          links: postData.links,
-          slug: postData.slug || slug,
-          content: postData.content || `<p>${postData.description}</p><p>This is a detailed article about ${postData.title.toLowerCase()}. The content would normally be stored in a rich text format and rendered here.</p>`,
-          relatedProjects: []
-        };
-
-        setContent(transformedContent);
-        await loadRelatedItems(transformedContent);
-      } catch (err) {
-        setError('Failed to load content');
-        console.error('Error loading content:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const loadRelatedItems = async (currentContent: DetailedContent) => {
+    const loadRelatedItems = async () => {
       try {
         // Get current item's tags
-        const currentTags = (currentContent.tags || []).map(tag => tag.text);
+        const currentTags = (content.tags || []).map(tag => tag.text);
 
         if (currentTags.length === 0) {
           setRelatedItems([]);
@@ -139,8 +122,8 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
       }
     };
 
-    loadContent();
-  }, [slug]);
+    loadRelatedItems();
+  }, [slug, content.tags]);
 
   const handleBackNavigation = () => {
     if (source === 'projects') {
@@ -149,34 +132,6 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
       router.push('/main/blog');
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f8f7fc] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading content...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !content) {
-    return (
-      <div className="min-h-screen bg-[#f8f7fc] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Content Not Found</h1>
-          <p className="text-gray-600 mb-6">The requested content could not be found.</p>
-          <button
-            onClick={handleBackNavigation}
-            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-200"
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#f8f7fc]">

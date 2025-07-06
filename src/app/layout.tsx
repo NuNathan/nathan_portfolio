@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import TopNavigation from "@/components/navigation/TopNavigation";
+import GlobalSpotlight from "@/components/spotlight/GlobalSpotlight";
 
 export const metadata: Metadata = {
   title: "Nathan's Portfolio",
@@ -18,6 +19,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet"></link>
       </head>
       <body>
+        <GlobalSpotlight />
         <TopNavigation />
         <main className="">
           {children}

@@ -42,13 +42,19 @@ export default async function AboutMe() {
                         >
                             {/* Profile image */}
                             <div className="w-full h-full overflow-hidden flex items-center justify-center">
-                                <Image
-                                    src={aboutMeData.headshot.url}
-                                    className="w-full h-full object-cover rounded-3xl"
-                                    width={640}
-                                    height={640}
-                                    alt={aboutMeData?.headshot?.alternativeText || "Headshot"}
-                                />
+                                {aboutMeData?.headshot?.url ? (
+                                    <Image
+                                        src={aboutMeData.headshot.url}
+                                        className="w-full h-full object-cover rounded-3xl"
+                                        width={640}
+                                        height={640}
+                                        alt={aboutMeData?.headshot?.alternativeText || "Headshot"}
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-6xl font-bold">
+                                        N
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -174,7 +180,7 @@ export default async function AboutMe() {
                         description="Download PDF"
                         buttonText="Download"
                         buttonBackground="#10b981"
-                        href={aboutMeData.resume.url}
+                        href={aboutMeData?.resume?.url || '#'}
                         iconBackgroundColor="#10b981"
                     />
                 </div>

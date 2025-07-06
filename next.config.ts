@@ -17,10 +17,6 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'nathan.binarybridges.ca',
       },
-      {
-        protocol: 'https',
-        hostname: 'via.placeholder.com',
-      },
     ],
   },
 };

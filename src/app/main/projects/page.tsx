@@ -5,6 +5,7 @@ import { PostData } from "@/api/posts";
 
 const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
+const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 
 export default async function Projects() {
   // Fetch project posts directly from Strapi
@@ -31,8 +32,10 @@ export default async function Projects() {
         ...post,
         // Transform img object with url property
         img: post.img && typeof post.img === 'object' && post.img.url
-          ? (post.img.url.startsWith('http') ? post.img.url : `${process.env.STRAPI_URL}${post.img.url}`)
-          : post.img,
+          ? (post.img.url.startsWith('http') ? post.img.url : `${STRAPI_MEDIA_URL}${post.img.url}`)
+          : (post.img && typeof post.img === 'string' && !post.img.startsWith('http')
+             ? `${STRAPI_MEDIA_URL}${post.img}`
+             : post.img),
         // Transform skillTags to tags
         tags: post.skillTags ? post.skillTags.map((skillTag: any) => ({
           id: skillTag.id,

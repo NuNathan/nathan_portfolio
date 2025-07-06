@@ -40,7 +40,12 @@ export default function TechnicalSkills({ skillCategories }: TechnicalSkillsProp
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {skillCategories.map((skillCategory, index) => (
           <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div className={`w-16 h-16 bg-gradient-to-r ${skillCategory.color} rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto`}>
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto"
+              style={{
+                background: skillCategory.color
+              }}
+            >
               {skillCategory.icon}
             </div>
 

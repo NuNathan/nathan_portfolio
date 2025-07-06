@@ -2,8 +2,9 @@ import HomeClient from "./HomeClient";
 import { getHomePage } from "@/api/homePage";
 
 export default async function Home() {
-  // Fetch home page data server-side
   // TODO: understand code, remove comments, and add metadata/SSO
+  // fix post page
+  // add custom error page(404)
   const homePageData = await getHomePage();
 
   return (

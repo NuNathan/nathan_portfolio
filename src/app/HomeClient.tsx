@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Circle from "../components/blob/Circle";
 import { BouncingCircleProvider } from "@/components/blob/CircleContext";
 import Title from "../components/title/Title";
@@ -26,8 +26,6 @@ const generateRandomCircleProps = (index: number, total: number, screenWidth: nu
 };
 
 export default function HomeClient({ homePageData }: HomeClientProps) {
-  const spotlightRef = useRef<HTMLSpanElement | null>(null);
-  const [hoveringTitle, setHoveringTitle] = useState(false);
   const [screenWidth, setScreenWidth] = useState(1200); // Default fallback
 
   // Extract skill tags from home page data
@@ -47,41 +45,18 @@ export default function HomeClient({ homePageData }: HomeClientProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    // Track spotlight
-    const handleMouseMove = (e: MouseEvent) => {
-      const x = e.clientX;
-      const y = e.clientY;
 
-      spotlightRef.current?.animate(
-        {
-          left: `${x}px`,
-          top: `${y}px`,
-        },
-        { duration: 150, fill: "forwards" }
-      );
-    };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  // Functions to make spotlight appear
+  // Functions to emit title hover events for global spotlight
   const mouseEnter = useCallback(() => {
-    setHoveringTitle(true)
+    window.dispatchEvent(new CustomEvent('titleHover', { detail: { hovering: true } }));
   }, [])
   const mouseLeave = useCallback(() => {
-    setHoveringTitle(false)
+    window.dispatchEvent(new CustomEvent('titleHover', { detail: { hovering: false } }));
   }, [])
 
   return (
     <>
-      <span
-        ref={spotlightRef}
-        className={`pointer-events-none fixed z-50 left-[50%] top-[50%] ${
-          hoveringTitle ? "w-[200px] h-[200px] mix-blend-overlay" : "w-[0px] h-[0px]"
-        } -translate-x-1/2 -translate-y-1/2 rounded-full bg-white transition-all duration-200`}
-      />
       <BouncingCircleProvider>
         <div className="relative h-full overflow-hidden">
           {/* Dynamic circles generated from skills data */}
