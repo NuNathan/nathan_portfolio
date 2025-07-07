@@ -5,6 +5,8 @@ import Circle from "../components/blob/Circle";
 import { BouncingCircleProvider } from "@/components/blob/CircleContext";
 import Title from "../components/title/Title";
 import { HomePageResponse } from "@/api/homePage";
+import { gpuBrandList } from "@/utils/lists";
+import SpinningShape from "@/components/spinning-shape/spinningShape";
 
 interface HomeClientProps {
   homePageData: HomePageResponse;
@@ -27,6 +29,7 @@ const generateRandomCircleProps = (index: number, total: number, screenWidth: nu
 
 export default function HomeClient({ homePageData }: HomeClientProps) {
   const [screenWidth, setScreenWidth] = useState(1200); // Default fallback
+  const [accelerated, setAccelerated] = useState(false);
 
   // Extract skill tags from home page data
   const skillsData = homePageData.data.skillTags;
@@ -43,6 +46,37 @@ export default function HomeClient({ homePageData }: HomeClientProps) {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    console.log("Checking WebGL support");
+
+    // WebGL detection
+    const canvas = document.createElement('canvas');
+    let gl: any;
+    let debugInfo;
+    let vendor: string | string[];
+    let renderer: any;
+
+    try {
+      gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    } catch (e) {
+      console.error('WebGL not supported', e);
+    }
+
+    if (gl) {
+      debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      if (debugInfo) {
+        vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+        renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        if(gpuBrandList.some(v => vendor.includes(v))){
+          setAccelerated(true);
+        }
+        console.log('GPU Vendor:', vendor);
+        console.log('GPU Renderer:', renderer);
+        console.log('Hardware Accelerated:', accelerated);
+      }
+    }
   }, []);
 
 
@@ -78,6 +112,17 @@ export default function HomeClient({ homePageData }: HomeClientProps) {
           })}
         </div>
       </BouncingCircleProvider>
+      {/* Temporarily always show SpinningShape for testing */}
+      <SpinningShape
+        textures={[
+          '/logo.png', // Using the existing image as a sample texture
+          '/title.png',
+        ]}
+        width={1200}
+        height={1200}
+      />
+
+      {/* Show Title as well for now */}
       <Title
         mouseEnter={mouseEnter}
         mouseLeave={mouseLeave}
@@ -86,6 +131,7 @@ export default function HomeClient({ homePageData }: HomeClientProps) {
         subHeader={homePageData.data.subHeader}
         resumeUrl={homePageData.data.resume?.url}
       />
+      
     </>
   );
 }
