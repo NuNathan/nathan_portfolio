@@ -1,8 +1,9 @@
 'use client';
 
 import SkillTag from "@/components/ui/SkillTag";
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface ProjectSlideProps {
     title: string;
@@ -33,21 +34,17 @@ export default function ProjectSlide({
     readTime,
     slug
 }: ProjectSlideProps) {
-    const router = useRouter();
     const pathname = usePathname();
 
-    const handleClick = () => {
-        if (slug) {
-            // Determine source based on current pathname
-            const source = pathname.includes('/projects') ? 'projects' : 'blog';
-            router.push(`/main/blog/${slug}?from=${source}`);
-        }
-    };
+    // Determine source based on current pathname for URL construction
+    const source = pathname.includes('/projects') ? 'projects' : 'blog';
+    const href = slug ? `/main/blog/${slug}?from=${source}` : '#';
 
     return (
-        <div
-            className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8 group cursor-pointer flex flex-col h-full"
-            onClick={handleClick}
+        <Link
+            href={href}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8 group cursor-pointer flex flex-col h-full block"
+            prefetch={true}
         >
             {/* Project Image */}
             <div className="relative h-48 overflow-hidden">
@@ -57,6 +54,10 @@ export default function ProjectSlide({
                     height={640}
                     alt={title}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    priority={false}
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                 />
                 {/* Hover Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-90 transition-opacity duration-300 flex items-center justify-center">
@@ -94,16 +95,16 @@ export default function ProjectSlide({
                 {/* Launch Demo button - moved above date/view/time section */}
                 {type === 'project' && links.demo && links.demo !== '' && links.demo !== '#' && (
                     <div className="mb-4">
-                        <a
-                            href={links.demo}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
+                        <button
+                            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-200"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(links.demo, '_blank', 'noopener,noreferrer');
+                            }}
                         >
-                            <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-200">
-                                Launch Demo
-                            </button>
-                        </a>
+                            Launch Demo
+                        </button>
                     </div>
                 )}
 
@@ -139,6 +140,6 @@ export default function ProjectSlide({
                     )}
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }

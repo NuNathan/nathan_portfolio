@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import DOMPurify from 'dompurify';
 import parse, { HTMLReactParserOptions, Element, domToReact, DOMNode } from 'html-react-parser';
+import Link from 'next/link';
 
 interface RichTextRendererProps {
   content: string;
   className?: string;
+  preventNestedLinks?: boolean; // Flag to prevent nested anchor tags
 }
 
 /**
@@ -16,7 +18,7 @@ interface RichTextRendererProps {
  * Supports: headings, paragraphs, lists, links, images, tables, code blocks,
  * blockquotes, emphasis, strong text, and more
  */
-export default function RichTextRenderer({ content, className = '' }: RichTextRendererProps) {
+export default function RichTextRenderer({ content, className = '', preventNestedLinks = false }: RichTextRendererProps) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -164,22 +166,51 @@ export default function RichTextRenderer({ content, className = '' }: RichTextRe
           case 'a':
             const href = attribs.href || '#';
             const isExternal = href.startsWith('http') && !href.includes('localhost') && !href.includes('127.0.0.1');
+            const isInternal = href.startsWith('/') || (!href.startsWith('http') && !href.startsWith('mailto:') && !href.startsWith('tel:'));
             const linkAttribs = { ...attribs };
+
+            // If preventNestedLinks is true, render as span instead of link
+            if (preventNestedLinks) {
+              return (
+                <span className="text-blue-600 underline cursor-pointer">
+                  {children}
+                </span>
+              );
+            }
 
             if (isExternal) {
               linkAttribs.target = '_blank';
               linkAttribs.rel = 'noopener noreferrer';
+              return (
+                <a
+                  href={href}
+                  className="text-blue-600 hover:text-blue-800 underline transition-colors duration-200"
+                  {...linkAttribs}
+                >
+                  {children}
+                </a>
+              );
+            } else if (isInternal) {
+              return (
+                <Link
+                  href={href}
+                  className="text-blue-600 hover:text-blue-800 underline transition-colors duration-200"
+                  prefetch={true}
+                >
+                  {children}
+                </Link>
+              );
+            } else {
+              return (
+                <a
+                  href={href}
+                  className="text-blue-600 hover:text-blue-800 underline transition-colors duration-200"
+                  {...linkAttribs}
+                >
+                  {children}
+                </a>
+              );
             }
-
-            return (
-              <a
-                href={href}
-                className="text-blue-600 hover:text-blue-800 underline transition-colors duration-200"
-                {...linkAttribs}
-              >
-                {children}
-              </a>
-            );
 
           // Images
           case 'img':
@@ -206,6 +237,9 @@ export default function RichTextRenderer({ content, className = '' }: RichTextRe
                     height={height}
                     className="rounded-lg shadow-sm max-w-full h-auto"
                     priority={false}
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                   />
                   {alt && (
                     <div className="text-sm text-gray-600 text-center mt-2 italic">{alt}</div>

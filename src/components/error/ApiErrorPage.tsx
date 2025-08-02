@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface ApiErrorPageProps {
   title?: string;
@@ -16,16 +16,11 @@ export default function ApiErrorPage({
   showRetry = true,
   showHome = true
 }: ApiErrorPageProps) {
-  const router = useRouter();
   const [attemptCount, setAttemptCount] = useState(1);
   const [isServiceDown, setIsServiceDown] = useState(false);
 
   const handleRetry = () => {
     window.location.reload();
-  };
-
-  const handleGoHome = () => {
-    router.push('/');
   };
 
   // Background health check every 10 seconds with retry counter
@@ -138,12 +133,13 @@ export default function ApiErrorPage({
             </button>
           )}
           {showHome && (
-            <button
-              onClick={handleGoHome}
-              className="flex-1 bg-gray-200 text-gray-900 px-6 py-3 rounded-md font-medium hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            <Link
+              href="/"
+              className="flex-1 bg-gray-200 text-gray-900 px-6 py-3 rounded-md font-medium hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center"
+              prefetch={true}
             >
               Go to Homepage
-            </button>
+            </Link>
           )}
         </div>
 

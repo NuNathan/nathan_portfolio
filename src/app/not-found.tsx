@@ -42,12 +42,14 @@ export default function NotFound() {
           <Link
             href="/"
             className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-center"
+            prefetch={true}
           >
             Go Home
           </Link>
           <Link
             href="/main/projects"
             className="flex-1 bg-gray-200 text-gray-900 px-6 py-3 rounded-md font-medium hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center"
+            prefetch={true}
           >
             View Projects
           </Link>
@@ -62,18 +64,21 @@ export default function NotFound() {
             <Link
               href="/main/about-me"
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              prefetch={true}
             >
               About Me
             </Link>
             <Link
               href="/main/experience"
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              prefetch={true}
             >
               Experience
             </Link>
             <Link
               href="/main/blog"
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              prefetch={true}
             >
               Blog
             </Link>

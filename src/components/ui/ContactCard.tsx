@@ -1,4 +1,5 @@
 import CustomButton from './CustomButton';
+import Link from 'next/link';
 
 interface ContactCardProps {
   icon: React.ReactNode;
@@ -31,14 +32,25 @@ export default function ContactCard({
       </div>
       <h4 className="font-semibold text-dark mb-2 text-sm sm:text-base">{title}</h4>
       <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{description}</p>
-      <a href={href} target="_blank" rel="noopener noreferrer">
-        <CustomButton
-          type={buttonType}
-          text={buttonText}
-          customBackground={buttonBackground}
-          altStyle={true}
-        />
-      </a>
+      {href.startsWith('http') ? (
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          <CustomButton
+            type={buttonType}
+            text={buttonText}
+            customBackground={buttonBackground}
+            altStyle={true}
+          />
+        </a>
+      ) : (
+        <Link href={href} prefetch={true}>
+          <CustomButton
+            type={buttonType}
+            text={buttonText}
+            customBackground={buttonBackground}
+            altStyle={true}
+          />
+        </Link>
+      )}
     </div>
   );
 }
