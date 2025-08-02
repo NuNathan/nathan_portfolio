@@ -72,3 +72,25 @@ export function getComplementaryColor(hex: string, rotation = 70): string {
 
   return `#${toHex(r1)}${toHex(g1)}${toHex(b1)}`;
 }
+
+export function toDarkTextColor(hex: string, darkenFactor = 0.6): string {
+  // Ensure hex starts with "#"
+  if (!hex.startsWith("#")) throw new Error("Hex color must start with '#'");
+
+  // Remove '#' and parse the R, G, B components
+  const bigint = parseInt(hex.slice(1), 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  // Darken the color by reducing each component
+  const darkR = Math.round(r * darkenFactor);
+  const darkG = Math.round(g * darkenFactor);
+  const darkB = Math.round(b * darkenFactor);
+
+  // Convert back to hex string
+  return `#${((1 << 24) + (darkR << 16) + (darkG << 8) + darkB)
+    .toString(16)
+    .slice(1)
+    .toUpperCase()}`;
+}

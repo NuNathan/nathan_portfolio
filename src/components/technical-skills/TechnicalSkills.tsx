@@ -59,6 +59,7 @@ export default function TechnicalSkills({ skillCategories }: TechnicalSkillsProp
                   mainColour={skill.mainColour}
                   variant="default"
                   size="sm"
+                  darkText={true}
                 />
               ))}
             </div>
