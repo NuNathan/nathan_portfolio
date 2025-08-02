@@ -1,7 +1,6 @@
 import Timeline from "@/components/experience/Timeline";
 import { getExperiencePage } from "@/api/experiences";
 import TechnicalSkills from "@/components/technical-skills/TechnicalSkills";
-import Card from "@/components/experience/Card";
 
 export default async function Experience() {
   let pageData: {

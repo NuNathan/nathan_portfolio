@@ -31,8 +31,8 @@ export default function GlobalSpotlight() {
 
       spotlightRef.current?.animate(
         {
-          left: `${x+15}px`,
-          top: `${y+15}px`,
+          left: `${x+4}px`,
+          top: `${y+4}px`,
         },
         { duration: 150, fill: "forwards" }
       );

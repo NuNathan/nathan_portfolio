@@ -151,7 +151,7 @@ export default function Timeline({ data }: TimelineProps) {
 
       {/* Timeline items grouped by year */}
       <div className="space-y-8">
-        {years.map((year, yearIndex) => (
+        {years.map((year) => (
           <div key={year} className="relative">
             {/* Year marker */}
             <div className="relative flex items-center mb-8">
@@ -162,7 +162,7 @@ export default function Timeline({ data }: TimelineProps) {
 
             {/* Items for this year */}
             <div className="space-y-6">
-              {itemsByYear[year].map((item, itemIndex) => {
+              {itemsByYear[year].map((item) => {
                 const globalIndex = allItems.findIndex(globalItem => 
                   globalItem.startDate === item.startDate && 
                   globalItem.title === item.title && 

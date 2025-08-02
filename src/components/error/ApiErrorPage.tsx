@@ -50,7 +50,7 @@ export default function ApiErrorPage({
             return newCount;
           });
         }
-      } catch (error) {
+      } catch {
         // Failed attempt, increment counter
         setAttemptCount(prev => {
           const newCount = prev + 1;

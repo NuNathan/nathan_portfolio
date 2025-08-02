@@ -41,10 +41,11 @@ export default function Circle({
         circles.current.push({ id: id.current, ref, pos: pos.current });
 
         // On unmount, remove itself from context
+        const currentId = id.current;
         return () => {
-            circles.current = circles.current.filter(c => c.id !== id.current);
+            circles.current = circles.current.filter(c => c.id !== currentId);
         };
-    }, []);
+    }, [circles]);
 
     useEffect(() => {
         let frameId: number;
@@ -152,7 +153,7 @@ export default function Circle({
 
         frameId = requestAnimationFrame(animate);
         return () => cancelAnimationFrame(frameId);
-    }, [size]);
+    }, [size, circles]);
 
 
 

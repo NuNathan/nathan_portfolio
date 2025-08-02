@@ -130,7 +130,7 @@ export async function checkStrapiHealth(): Promise<boolean> {
       signal: AbortSignal.timeout(5000),
     });
     return response.ok;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
