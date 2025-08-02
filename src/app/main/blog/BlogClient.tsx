@@ -80,14 +80,14 @@ export default function BlogClient({
     };
 
     fetchPosts();
-  }, [currentPage, debouncedSearchTerm, selectedType, sortBy]);
+  }, [currentPage, debouncedSearchTerm, selectedType, sortBy, hasSearched]);
 
   // Reset to page 1 when search or filters change
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
     }
-  }, [debouncedSearchTerm, selectedType, sortBy]);
+  }, [debouncedSearchTerm, selectedType, sortBy, currentPage]);
 
   return (
     <>

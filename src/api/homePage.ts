@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { analyzeError, isApiDownError } from '@/utils/error-handling';
 
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
@@ -42,6 +43,7 @@ export async function getHomePage(): Promise<HomePageResponse> {
       headers: {
         Authorization: `Bearer ${STRAPI_TOKEN}`,
       },
+      timeout: 10000, // 10 second timeout
     });
 
     // Transform the response to include full URLs for file assets
@@ -52,7 +54,13 @@ export async function getHomePage(): Promise<HomePageResponse> {
 
     return data;
   } catch (error) {
-    console.error('Error fetching home-page:', error);
+    const analyzedError = analyzeError(error);
+    console.error(`Home page API error (${analyzedError.type}):`, analyzedError.message);
+
+    // If this looks like the API is down, we'll let the page component handle it
+    if (isApiDownError(error)) {
+      console.warn('API appears to be down, returning fallback data with indicator');
+    }
     // Return fallback data if API fails
     return {
       data: {
@@ -67,7 +75,7 @@ export async function getHomePage(): Promise<HomePageResponse> {
           alternativeText: "Resume",
           caption: "Resume",
           size: 0,
-          url:  `${window.location.origin}/main/about-me`,
+          url: "/main/about-me",
           previewUrl: null,
         },
         skillTags: [

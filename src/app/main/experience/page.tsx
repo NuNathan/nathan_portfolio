@@ -1,4 +1,4 @@
-import Timeline from "@/components/timeline/Timeline";
+import Timeline from "@/components/experience/Timeline";
 import { getExperiencePage } from "@/api/experiences";
 import TechnicalSkills from "@/components/technical-skills/TechnicalSkills";
 
@@ -58,9 +58,43 @@ export default async function Experience() {
             {pageData.subHeader}
           </p>
         </div>
-
+        
         {/* Timeline Section */}
         <Timeline data={{ experiences: pageData.experiences }} />
+
+        
+
+        {/* Experience Cards Section - Hidden since we're using Timeline now */}
+        {/* <div className="space-y-6">
+          {pageData.experiences.length > 0 ? (
+            pageData.experiences
+              .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()) // Sort by newest first
+              .map((experience, index) => {
+                // Color assignment logic from Timeline component
+                const allColors = [
+                  '#FF6B35', '#17A2B8', '#DC3545', '#28A745', '#6F42C1',
+                  '#20C997', '#E83E8C', '#FFC107', '#6C757D',
+                  '#6610f2', '#d63384', '#198754', '#0dcaf0', '#adb5bd'
+                ];
+                const color = allColors[index % allColors.length];
+
+                return (
+                  <Card
+                    key={`${experience.type}-${experience.title || experience.school}-${experience.startDate}`}
+                    item={experience}
+                    color={color}
+                    className="max-w-4xl mx-auto"
+                  />
+                );
+              })
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No experience data available</p>
+            </div>
+          )}
+        </div> */}
+
+
 
         {/* Technical Skills Section - only render if we have skill categories */}
         {pageData.skillCategories && pageData.skillCategories.length > 0 && (

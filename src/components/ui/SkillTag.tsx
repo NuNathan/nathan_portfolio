@@ -1,17 +1,19 @@
-import { toPastelColor } from "@/utils/colours";
+import { toPastelColor, toDarkTextColor } from "@/utils/colours";
 
 interface SkillTagProps {
   text: string;
   mainColour: string;
   variant?: 'default' | 'blog';
   size?: 'sm' | 'md';
+  darkText?: boolean;
 }
 
-export default function SkillTag({ 
-  text, 
-  mainColour, 
+export default function SkillTag({
+  text,
+  mainColour,
   variant = 'default',
-  size = 'sm'
+  size = 'sm',
+  darkText = false
 }: SkillTagProps) {
   const sizeClasses = {
     sm: 'px-3 py-1 text-xs',
@@ -38,7 +40,7 @@ export default function SkillTag({
     <span
       className={`${sizeClasses[size]} rounded-full font-medium inline-block`}
       style={{
-        color: mainColour || '#fff',
+        color: darkText ? toDarkTextColor(mainColour || '#FF746C') : (mainColour || '#fff'),
         backgroundColor: toPastelColor(mainColour || '#FF746C')
       }}
     >
