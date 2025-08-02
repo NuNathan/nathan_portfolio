@@ -1,14 +1,14 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface TopNavigationProps {
   className?: string;
 }
 
 export default function TopNavigation({ className = '' }: TopNavigationProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -20,23 +20,6 @@ export default function TopNavigation({ className = '' }: TopNavigationProps) {
     { name: 'About', href: '/main/about-me' },
     { name: 'Blog', href: '/main/blog' },
   ];
-
-  const handleNavigation = (href: string, name: string) => {
-    // Close mobile menu when navigating
-    setIsMobileMenuOpen(false);
-
-    if (name === 'Nathan') {
-      router.push('/');
-    } else if (name === 'Projects') {
-      router.push('/main/projects');
-    } else if (name === 'Experience') {
-      router.push('/main/experience');
-    } else if (name === 'About') {
-      router.push('/main/about-me');
-    } else if (name === 'Blog') {
-      router.push('/main/blog');
-    }
-  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -63,12 +46,13 @@ export default function TopNavigation({ className = '' }: TopNavigationProps) {
           <div className="flex justify-center items-center h-16 relative">
             {/* Logo/Brand - positioned absolutely to the left */}
             <div className="absolute left-0">
-              <button
-                onClick={() => handleNavigation('/', 'Nathan')}
+              <Link
+                href="/"
                 className="text-2xl font-bold text-gradient-primary hover:opacity-80 transition-opacity duration-200"
+                prefetch={true}
               >
                 Nathan
-              </button>
+              </Link>
             </div>
 
             {/* Navigation Items - centered */}
@@ -77,9 +61,9 @@ export default function TopNavigation({ className = '' }: TopNavigationProps) {
                 {navigationItems.slice(1).map((item) => {
                   const isActive = pathname === item.href;
                   return (
-                    <button
+                    <Link
                       key={item.name}
-                      onClick={() => handleNavigation(item.href, item.name)}
+                      href={item.href}
                       onMouseEnter={() => setActiveItem(item.name)}
                       onMouseLeave={() => setActiveItem(null)}
                       className={`px-4 py-2 text-base font-medium rounded-md ${
@@ -89,9 +73,10 @@ export default function TopNavigation({ className = '' }: TopNavigationProps) {
                           ? 'text-gradient-primary bg-light/60 backdrop-blur-sm'
                           : 'text-dark'
                       }`}
+                      prefetch={true}
                     >
                       {item.name}
-                    </button>
+                    </Link>
                   );
                 })}
               </div>
@@ -141,17 +126,19 @@ export default function TopNavigation({ className = '' }: TopNavigationProps) {
             {navigationItems.slice(1).map((item) => {
               const isActive = pathname === item.href;
               return (
-                <button
+                <Link
                   key={item.name}
-                  onClick={() => handleNavigation(item.href, item.name)}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={`block w-full text-left px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 ${
                     isActive
                       ? 'text-[#2b61eb] bg-blue-50 border-l-4 border-[#2b61eb]'
                       : 'text-dark hover:text-[#2b61eb] hover:bg-gray-50 hover:translate-x-1'
                   }`}
+                  prefetch={true}
                 >
                   {item.name}
-                </button>
+                </Link>
               );
             })}
           </div>

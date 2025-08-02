@@ -1,13 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function CallToAction() {
-    const router = useRouter();
-
-    const handleGetInTouch = () => {
-        router.push('/main/about-me');
-    };
 
     return (
         <div className="mt-16 mb-8">
@@ -17,12 +12,13 @@ export default function CallToAction() {
                     Let's bring your next project to life together
                 </p>
 
-                <button
-                    onClick={handleGetInTouch}
-                    className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                <Link
+                    href="/main/about-me"
+                    className="inline-block px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                    prefetch={true}
                 >
                     Get in Touch
-                </button>
+                </Link>
             </div>
         </div>
     );

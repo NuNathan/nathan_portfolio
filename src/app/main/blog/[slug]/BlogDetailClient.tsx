@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import SkillTag from "@/components/ui/SkillTag";
 import ProjectSlide from "@/components/project-slide/ProjectSlide";
 import RichTextRenderer from "@/components/ui/RichTextRenderer";
 import { PostData } from "@/api/posts";
 import Image from 'next/image';
+import Link from 'next/link';
 
 // Rich text renderer now supports full CKEditor output including all HTML elements
 
@@ -52,7 +53,7 @@ type BlogItem = PostData;
 
 export default function BlogDetailClient({ slug, postData }: BlogDetailClientProps) {
   const [relatedItems, setRelatedItems] = useState<BlogItem[]>([]);
-  const router = useRouter();
+  const [loadingRelated, setLoadingRelated] = useState(true);
   const searchParams = useSearchParams();
 
   // Determine the source (Projects or Blog) from URL parameters or referrer
@@ -105,9 +106,9 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
         });
         queryParams.append('filters[slug][$ne]', slug);
 
-        // Fetch related posts from API
+        // Fetch related posts from API with shorter timeout for better UX
         const response = await fetch(`/api/posts?${queryParams.toString()}`, {
-          signal: AbortSignal.timeout(20000), // 20 second timeout
+          signal: AbortSignal.timeout(10000), // Reduced to 10 second timeout
         });
 
         if (!response.ok) {
@@ -119,31 +120,31 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
       } catch (err) {
         console.error('Error loading related items:', err);
         setRelatedItems([]);
+      } finally {
+        setLoadingRelated(false);
       }
     };
 
-    loadRelatedItems();
+    // Delay loading related items to prioritize main content
+    const timer = setTimeout(loadRelatedItems, 500);
+    return () => clearTimeout(timer);
   }, [slug, content.tags]);
 
-  const handleBackNavigation = () => {
-    if (source === 'projects') {
-      router.push('/main/projects');
-    } else {
-      router.push('/main/blog');
-    }
-  };
+  // Determine back navigation URL
+  const backUrl = source === 'projects' ? '/main/projects' : '/main/blog';
 
   return (
     <div className="min-h-screen bg-[#f8f7fc]">
       {/* Breadcrumb Navigation */}
       <div className="max-w-4xl mx-auto px-4 pt-4 sm:pt-8 pb-4">
         <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 sm:mb-8">
-          <button
-            onClick={handleBackNavigation}
+          <Link
+            href={backUrl}
             className="hover:text-blue-600 transition-colors duration-200"
+            prefetch={true}
           >
             {breadcrumbText}
-          </button>
+          </Link>
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
           </svg>
@@ -162,6 +163,9 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
               width={1080}
               height={1920}
               className="w-full h-full object-cover"
+              priority={true}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
@@ -209,6 +213,8 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
                     height={64}
                     alt={content.author.name}
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+                    priority={false}
+                    loading="lazy"
                   />
                 ) : (
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm">
@@ -299,28 +305,45 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
         </div>
 
         {/* Related Items */}
-        {relatedItems.length > 0 && (
+        {(loadingRelated || relatedItems.length > 0) && (
           <div className="mt-12">
             <h2 className="text-3xl font-bold text-center mb-8 text-gradient-primary">
               Related {content.type === 'project' ? 'Projects' : 'Articles'}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {relatedItems.map((item) => (
-                <ProjectSlide
-                  key={item.id}
-                  title={item.title}
-                  description={item.description}
-                  img={item.img}
-                  tags={item.tags}
-                  type={item.type}
-                  date={item.date}
-                  views={item.views}
-                  readTime={item.readTime}
-                  links={item.links}
-                  slug={item.slug}
-                />
-              ))}
-            </div>
+            {loadingRelated ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Loading skeletons */}
+                {[1, 2].map((i) => (
+                  <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
+                    <div className="h-48 bg-gray-200"></div>
+                    <div className="p-6">
+                      <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                      <div className="h-6 bg-gray-200 rounded mb-3"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {relatedItems.map((item) => (
+                  <ProjectSlide
+                    key={item.id}
+                    title={item.title}
+                    description={item.description}
+                    img={item.img}
+                    tags={item.tags}
+                    type={item.type}
+                    date={item.date}
+                    views={item.views}
+                    readTime={item.readTime}
+                    links={item.links}
+                    slug={item.slug}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

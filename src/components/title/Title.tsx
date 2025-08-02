@@ -1,8 +1,7 @@
 'use client';
 import "./title.css";
 import CustomButton from "../ui/CustomButton";
-import { useRouter } from 'next/navigation';
-import { useCallback } from "react";
+import Link from 'next/link';
 
 interface TitleProps {
   mouseEnter: () => void;
@@ -14,11 +13,6 @@ interface TitleProps {
 }
 
 const DivWrapper = ({mouseEnter, mouseLeave, hidden, header, subHeader, resumeUrl}: TitleProps) => {
-  const router = useRouter();
-
-  const handleExploreWork = useCallback(() => {
-    router.push('/main/projects');
-  }, [router]);
   return (
     <div
       className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center w-full max-w-[875px] px-4 z-10"
@@ -57,11 +51,12 @@ const DivWrapper = ({mouseEnter, mouseLeave, hidden, header, subHeader, resumeUr
 
       {/* Custom Buttons */}
       <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-        <CustomButton
-          type="filled"
-          text="Explore My Work"
-          onClick={handleExploreWork}
-        />
+        <Link href="/main/projects" prefetch={true}>
+          <CustomButton
+            type="filled"
+            text="Explore My Work"
+          />
+        </Link>
         <a href={resumeUrl || "#"} target="_blank" rel="noreferrer">
           <CustomButton
             type="outlined"
