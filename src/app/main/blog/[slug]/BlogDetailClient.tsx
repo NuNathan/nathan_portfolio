@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SkillTag from "@/components/ui/SkillTag";
 import ProjectSlide from "@/components/project-slide/ProjectSlide";
@@ -51,14 +51,19 @@ interface BlogDetailClientProps {
 // Use PostData from API instead of separate interface
 type BlogItem = PostData;
 
-export default function BlogDetailClient({ slug, postData }: BlogDetailClientProps) {
-  const [relatedItems, setRelatedItems] = useState<BlogItem[]>([]);
-  const [loadingRelated, setLoadingRelated] = useState(true);
+// Component that uses useSearchParams - needs to be wrapped in Suspense
+function SearchParamsHandler({ children }: { children: (source: string, breadcrumbText: string) => React.ReactNode }) {
   const searchParams = useSearchParams();
-
-  // Determine the source (Projects or Blog) from URL parameters or referrer
   const source = searchParams.get('from') || 'blog';
   const breadcrumbText = source === 'projects' ? 'Projects' : 'Blog';
+
+  return <>{children(source, breadcrumbText)}</>;
+}
+
+// Main component without useSearchParams
+function BlogDetailContent({ slug, postData, source, breadcrumbText }: BlogDetailClientProps & { source: string; breadcrumbText: string }) {
+  const [relatedItems, setRelatedItems] = useState<BlogItem[]>([]);
+  const [loadingRelated, setLoadingRelated] = useState(true);
 
   // Transform postData to DetailedContent format
   const content: DetailedContent = {
@@ -348,5 +353,30 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
         )}
       </div>
     </div>
+  );
+}
+
+// Main export component with proper Suspense handling
+export default function BlogDetailClient({ slug, postData }: BlogDetailClientProps) {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f8f7fc] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading post...</p>
+        </div>
+      </div>
+    }>
+      <SearchParamsHandler>
+        {(source, breadcrumbText) => (
+          <BlogDetailContent
+            slug={slug}
+            postData={postData}
+            source={source}
+            breadcrumbText={breadcrumbText}
+          />
+        )}
+      </SearchParamsHandler>
+    </Suspense>
   );
 }

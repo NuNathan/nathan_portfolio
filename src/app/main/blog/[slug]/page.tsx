@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import axios from 'axios';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
-import { Suspense } from 'react';
 
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
@@ -247,14 +246,7 @@ export default async function BlogDetailPage(props: unknown) {
       return (
         <>
           <StructuredData type={structuredData.type} data={structuredData.data} />
-          <Suspense fallback={<div className="min-h-screen bg-[#f8f7fc] flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading post...</p>
-            </div>
-          </div>}>
-            <BlogDetailClient slug={slug} postData={postData} />
-          </Suspense>
+          <BlogDetailClient slug={slug} postData={postData} />
         </>
       );
     }
