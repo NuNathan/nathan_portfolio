@@ -33,6 +33,60 @@ const nextConfig: NextConfig = {
   // Security and SEO headers
   async headers() {
     return [
+      // No cache for blog and project pages (Vercel-specific)
+      {
+        source: '/main/blog/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate'
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'no-cache'
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'no-cache'
+          }
+        ]
+      },
+      {
+        source: '/main/projects',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate'
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'no-cache'
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'no-cache'
+          }
+        ]
+      },
+      // Cache other pages for 48 hours
+      {
+        source: '/((?!main/blog|main/projects).*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=172800, s-maxage=172800'
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, max-age=172800'
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
+            value: 'public, max-age=172800'
+          }
+        ]
+      },
+      // Global security headers
       {
         source: '/(.*)',
         headers: [

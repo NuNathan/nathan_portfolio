@@ -10,6 +10,10 @@ const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 
+// Disable all caching for this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Function to fetch post data for metadata
 async function getPostData(slug: string): Promise<PostData | null> {
   try {
@@ -20,6 +24,9 @@ async function getPostData(slug: string): Promise<PostData | null> {
     const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
       headers: {
         Authorization: `Bearer ${STRAPI_TOKEN}`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
       },
       timeout: 20000,
     });
@@ -112,44 +119,10 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   };
 }
 
-// Generate static params for all blog posts (for better SEO and performance)
+// Disable static generation since we want no caching
 export async function generateStaticParams() {
-  try {
-    const queryParams = new URLSearchParams();
-    // Use the same pattern as your working API calls
-    queryParams.append('populate', '*');
-    queryParams.append('pagination[pageSize]', '100'); // Get all posts
-    queryParams.append('sort[0]', 'updatedAt:desc');
-
-    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-      },
-      timeout: 10000,
-    });
-
-    const posts = response.data?.data || [];
-    console.log(`Found ${posts.length} posts for static generation`);
-
-    return posts
-      .filter((post: any) => post.slug && typeof post.slug === 'string')
-      .map((post: any) => {
-        console.log(`Generating static page for slug: ${post.slug}`);
-        return {
-          slug: post.slug,
-        };
-      });
-  } catch (error) {
-    console.error('Error generating static params for blog posts:', error);
-    console.error('API URL:', `${STRAPI_URL}/posts`);
-    if (error && typeof error === 'object' && 'response' in error) {
-      console.error('Error details:', (error as any).response?.data);
-    } else if (error instanceof Error) {
-      console.error('Error message:', error.message);
-    }
-    // Return empty array to allow build to continue
-    return [];
-  }
+  // Return empty array to force dynamic rendering for all blog posts
+  return [];
 }
 
 // Function to get author headshot from about-me data
@@ -184,6 +157,9 @@ export default async function BlogDetailPage(props: unknown) {
     const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
       headers: {
         Authorization: `Bearer ${STRAPI_TOKEN}`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
       },
       timeout: 20000, // 20 second timeout
     });

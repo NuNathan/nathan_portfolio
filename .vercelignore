@@ -1,0 +1,16 @@
+# Ignore test directories and files
+src/app/test-*
+*.test.*
+*.spec.*
+
+# Ignore development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore documentation that doesn't need to be deployed
+SEO_IMPLEMENTATION_SUMMARY.md
+BLOG_SEO_IMPLEMENTATION.md
+API_DEBUGGING.md
+docs/

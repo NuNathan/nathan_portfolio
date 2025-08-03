@@ -50,6 +50,10 @@ const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 
+// Disable all caching for this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function Projects() {
   // Fetch project posts directly from Strapi
   let projectPosts: PostData[] = [];
@@ -64,7 +68,11 @@ export default async function Projects() {
     const response = await fetch(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
       headers: {
         'Authorization': `Bearer ${STRAPI_TOKEN}`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
       },
+      cache: 'no-store', // Next.js specific - disable all caching
     });
 
     if (response.ok) {

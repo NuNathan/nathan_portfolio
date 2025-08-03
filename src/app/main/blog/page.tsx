@@ -49,6 +49,10 @@ const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 
+// Disable all caching for this page
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function Blog() {
   // Fetch initial posts server-side (first page, latest first, all types)
   let initialPosts: PostData[] = [];
@@ -65,6 +69,9 @@ export default async function Blog() {
     const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
       headers: {
         Authorization: `Bearer ${STRAPI_TOKEN}`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
       },
       timeout: 20000,
     });
