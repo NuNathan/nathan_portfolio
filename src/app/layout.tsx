@@ -14,6 +14,7 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://nathan.binarybridges.ca'),
   title: {
     default: "Nathan Campbell - Computer Science Portfolio",
     template: "%s | Nathan Campbell"

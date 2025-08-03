@@ -8,7 +8,8 @@ const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 async function getAllBlogPosts() {
   try {
     const queryParams = new URLSearchParams();
-    queryParams.append('populate', 'slug');
+    // Use the same pattern as working API calls
+    queryParams.append('populate', '*');
     queryParams.append('pagination[pageSize]', '100'); // Get all posts
     queryParams.append('sort[0]', 'updatedAt:desc');
 
@@ -67,7 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic blog posts
   const blogPosts = await getAllBlogPosts();
   const blogPostPages: MetadataRoute.Sitemap = blogPosts
-    .filter((post: any) => post.slug) // Only include posts with slugs
+    .filter((post: any) => post.slug && typeof post.slug === 'string') // Only include posts with valid slugs
     .map((post: any) => ({
       url: `${baseUrl}/main/blog/${post.slug}`,
       lastModified: post.updatedAt || post.publishedAt || currentDate,
@@ -75,5 +76,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
+  // Always return at least the static pages, even if blog posts fail
   return [...staticPages, ...blogPostPages];
 }

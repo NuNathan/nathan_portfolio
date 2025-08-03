@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import axios from 'axios';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
+import { Suspense } from 'react';
 
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
@@ -115,8 +116,10 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 export async function generateStaticParams() {
   try {
     const queryParams = new URLSearchParams();
-    queryParams.append('fields[0]', 'slug');
-    queryParams.append('pagination[pageSize]', '100');
+    // Use the same pattern as your working API calls
+    queryParams.append('populate', '*');
+    queryParams.append('pagination[pageSize]', '100'); // Get all posts
+    queryParams.append('sort[0]', 'updatedAt:desc');
 
     const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
       headers: {
@@ -126,13 +129,25 @@ export async function generateStaticParams() {
     });
 
     const posts = response.data?.data || [];
+    console.log(`Found ${posts.length} posts for static generation`);
+
     return posts
-      .filter((post: any) => post.slug)
-      .map((post: any) => ({
-        slug: post.slug,
-      }));
+      .filter((post: any) => post.slug && typeof post.slug === 'string')
+      .map((post: any) => {
+        console.log(`Generating static page for slug: ${post.slug}`);
+        return {
+          slug: post.slug,
+        };
+      });
   } catch (error) {
     console.error('Error generating static params for blog posts:', error);
+    console.error('API URL:', `${STRAPI_URL}/posts`);
+    if (error && typeof error === 'object' && 'response' in error) {
+      console.error('Error details:', (error as any).response?.data);
+    } else if (error instanceof Error) {
+      console.error('Error message:', error.message);
+    }
+    // Return empty array to allow build to continue
     return [];
   }
 }
@@ -256,7 +271,14 @@ export default async function BlogDetailPage(props: unknown) {
       return (
         <>
           <StructuredData type={structuredData.type} data={structuredData.data} />
-          <BlogDetailClient slug={slug} postData={postData} />
+          <Suspense fallback={<div className="min-h-screen bg-[#f8f7fc] flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading post...</p>
+            </div>
+          </div>}>
+            <BlogDetailClient slug={slug} postData={postData} />
+          </Suspense>
         </>
       );
     }
