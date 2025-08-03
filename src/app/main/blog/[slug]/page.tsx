@@ -1,9 +1,11 @@
-import BlogDetailClient from './BlogDetailClient';
+import BlogDetailClient from './BlogDetailClientNew';
 import { PostData } from '@/api/posts';
 import { notFound } from 'next/navigation';
 import axios from 'axios';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
+
+// Version 2.0 - Fixed useSearchParams issue
 
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;

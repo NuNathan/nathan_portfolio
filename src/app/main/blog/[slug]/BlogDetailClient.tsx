@@ -8,6 +8,8 @@ import { PostData } from "@/api/posts";
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Force component refresh by adding a comment to trigger rebuild
+
 // Rich text renderer now supports full CKEditor output including all HTML elements
 
 interface DetailedContent {
