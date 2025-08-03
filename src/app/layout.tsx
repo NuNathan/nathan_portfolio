@@ -89,9 +89,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Security and Bot Protection Headers */}
+        {/* Security Headers - Note: X-Frame-Options removed as it should only be in HTTP headers */}
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-        <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
         <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
 

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import SkillTag from "@/components/ui/SkillTag";
 import ProjectSlide from "@/components/project-slide/ProjectSlide";
 import RichTextRenderer from "@/components/ui/RichTextRenderer";
@@ -51,19 +50,13 @@ interface BlogDetailClientProps {
 // Use PostData from API instead of separate interface
 type BlogItem = PostData;
 
-// Component that uses useSearchParams - needs to be wrapped in Suspense
-function SearchParamsHandler({ children }: { children: (source: string, breadcrumbText: string) => React.ReactNode }) {
-  const searchParams = useSearchParams();
-  const source = searchParams.get('from') || 'blog';
-  const breadcrumbText = source === 'projects' ? 'Projects' : 'Blog';
-
-  return <>{children(source, breadcrumbText)}</>;
-}
-
-// Main component without useSearchParams
-function BlogDetailContent({ slug, postData, source, breadcrumbText }: BlogDetailClientProps & { source: string; breadcrumbText: string }) {
+// Simplified component without useSearchParams to avoid production issues
+export default function BlogDetailClient({ slug, postData }: BlogDetailClientProps) {
   const [relatedItems, setRelatedItems] = useState<BlogItem[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(true);
+
+  // Use default values instead of useSearchParams to avoid Suspense issues
+  const breadcrumbText = 'Blog';
 
   // Transform postData to DetailedContent format
   const content: DetailedContent = {
@@ -135,8 +128,8 @@ function BlogDetailContent({ slug, postData, source, breadcrumbText }: BlogDetai
     return () => clearTimeout(timer);
   }, [slug, content.tags]);
 
-  // Determine back navigation URL
-  const backUrl = source === 'projects' ? '/main/projects' : '/main/blog';
+  // Determine back navigation URL - always go back to blog for now
+  const backUrl = '/main/blog';
 
   return (
     <div className="min-h-screen bg-[#f8f7fc]">
@@ -356,27 +349,4 @@ function BlogDetailContent({ slug, postData, source, breadcrumbText }: BlogDetai
   );
 }
 
-// Main export component with proper Suspense handling
-export default function BlogDetailClient({ slug, postData }: BlogDetailClientProps) {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#f8f7fc] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading post...</p>
-        </div>
-      </div>
-    }>
-      <SearchParamsHandler>
-        {(source, breadcrumbText) => (
-          <BlogDetailContent
-            slug={slug}
-            postData={postData}
-            source={source}
-            breadcrumbText={breadcrumbText}
-          />
-        )}
-      </SearchParamsHandler>
-    </Suspense>
-  );
-}
+
