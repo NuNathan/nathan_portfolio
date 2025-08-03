@@ -1,6 +1,47 @@
 import Timeline from "@/components/experience/Timeline";
 import { getExperiencePage } from "@/api/experiences";
 import TechnicalSkills from "@/components/technical-skills/TechnicalSkills";
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Experience - Nathan Campbell's Professional Journey",
+  description: "Discover Nathan Campbell's professional experience, education, and technical skills in Computer Science. View his career timeline, educational background, and expertise in modern web technologies.",
+  keywords: [
+    "Nathan Campbell Experience",
+    "Computer Science Experience",
+    "Professional Timeline",
+    "Education Background",
+    "Technical Skills",
+    "Career Journey",
+    "Work Experience",
+    "Software Development Skills",
+    "Programming Experience",
+    "Professional Development"
+  ],
+  openGraph: {
+    title: "Experience - Nathan Campbell's Professional Journey",
+    description: "Discover Nathan Campbell's professional experience, education, and technical skills in Computer Science.",
+    url: "https://nathan.binarybridges.ca/main/experience",
+    type: "website",
+    images: [
+      {
+        url: "/experience-og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Nathan Campbell - Professional Experience",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Experience - Nathan Campbell's Professional Journey",
+    description: "Discover Nathan Campbell's professional experience, education, and technical skills in Computer Science.",
+    images: ["/experience-og-image.jpg"],
+  },
+  alternates: {
+    canonical: "https://nathan.binarybridges.ca/main/experience",
+  },
+};
 
 export default async function Experience() {
   let pageData: {

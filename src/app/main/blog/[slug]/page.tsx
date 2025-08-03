@@ -2,10 +2,140 @@ import BlogDetailClient from './BlogDetailClient';
 import { PostData } from '@/api/posts';
 import { notFound } from 'next/navigation';
 import axios from 'axios';
+import { Metadata } from 'next';
+import StructuredData from '@/components/seo/StructuredData';
 
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
+
+// Function to fetch post data for metadata
+async function getPostData(slug: string): Promise<PostData | null> {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append('populate', '*');
+    queryParams.append('filters[slug][$eq]', slug);
+
+    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
+      },
+      timeout: 20000,
+    });
+
+    const data = response.data;
+    if (data.data && data.data.length > 0) {
+      const post = data.data[0];
+
+      // Handle img object with url property
+      if (post.img && typeof post.img === 'object' && post.img.url) {
+        const imgUrl = post.img.url;
+        post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_MEDIA_URL}${imgUrl}`;
+      } else if (post.img && typeof post.img === 'string' && !post.img.startsWith('http')) {
+        post.img = `${STRAPI_MEDIA_URL}${post.img}`;
+      }
+
+      return post;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching post data for metadata:', error);
+    return null;
+  }
+}
+
+// Generate metadata for individual blog posts
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await props.params;
+  const post = await getPostData(slug);
+
+  if (!post) {
+    return {
+      title: 'Post Not Found | Nathan Campbell',
+      description: 'The requested blog post could not be found.',
+    };
+  }
+
+  // Extract text content from rich text for description
+  const cleanDescription = post.description || 'Read this technical article by Nathan Campbell';
+  const postDate = post.completionDate ? new Date(post.completionDate).toISOString() : new Date().toISOString();
+  const postUrl = `https://nathan.binarybridges.ca/main/blog/${slug}`;
+
+  // Generate keywords from tags
+  const keywords = [
+    'Nathan Campbell',
+    post.title,
+    ...(post.tags?.map((tag: any) => tag.text || tag.skill) || []),
+    'Technical Article',
+    'Blog Post',
+    'Software Engineering',
+    'Web Development'
+  ];
+
+  return {
+    title: `${post.title} | Nathan Campbell`,
+    description: cleanDescription,
+    keywords,
+    authors: [{ name: 'Nathan Campbell' }],
+    creator: 'Nathan Campbell',
+    publisher: 'Nathan Campbell',
+    openGraph: {
+      title: post.title,
+      description: cleanDescription,
+      url: postUrl,
+      type: 'article',
+      publishedTime: postDate,
+      modifiedTime: post.updatedAt || postDate,
+      authors: ['Nathan Campbell'],
+      section: 'Technology',
+      tags: post.tags?.map((tag: any) => tag.text || tag.skill) || [],
+      images: [
+        {
+          url: post.img || '/blog-og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        }
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: cleanDescription,
+      images: [post.img || '/blog-og-image.jpg'],
+      creator: '@NRCsme',
+    },
+    alternates: {
+      canonical: postUrl,
+    },
+  };
+}
+
+// Generate static params for all blog posts (for better SEO and performance)
+export async function generateStaticParams() {
+  try {
+    const queryParams = new URLSearchParams();
+    queryParams.append('fields[0]', 'slug');
+    queryParams.append('pagination[pageSize]', '100');
+
+    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${STRAPI_TOKEN}`,
+      },
+      timeout: 10000,
+    });
+
+    const posts = response.data?.data || [];
+    return posts
+      .filter((post: any) => post.slug)
+      .map((post: any) => ({
+        slug: post.slug,
+      }));
+  } catch (error) {
+    console.error('Error generating static params for blog posts:', error);
+    return [];
+  }
+}
 
 // Function to get author headshot from about-me data
 async function getAuthorHeadshot(): Promise<string | null> {
@@ -107,7 +237,28 @@ export default async function BlogDetailPage(props: unknown) {
       post.views = post.views || 0;
 
       const postData: PostData = post;
-      return <BlogDetailClient slug={slug} postData={postData} />;
+
+      // Prepare structured data for the article
+      const structuredData = {
+        type: 'article' as const,
+        data: {
+          title: post.title,
+          description: post.description,
+          publishedDate: post.completionDate || post.publishedAt,
+          modifiedDate: post.updatedAt,
+          image: post.img,
+          url: `https://nathan.binarybridges.ca/main/blog/${slug}`,
+          tags: post.tags?.map((tag: any) => tag.text || tag.skill),
+          wordCount: post.content ? post.content.split(' ').length : 500
+        }
+      };
+
+      return (
+        <>
+          <StructuredData type={structuredData.type} data={structuredData.data} />
+          <BlogDetailClient slug={slug} postData={postData} />
+        </>
+      );
     }
 
     // If no data found, return 404

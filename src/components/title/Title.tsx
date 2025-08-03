@@ -44,7 +44,7 @@ const DivWrapper = ({mouseEnter, mouseLeave, hidden, header, subHeader, resumeUr
       <div className="text-dark text-[16px] sm:text-[18px] md:text-[20px] flex flex-col relative z-10 mt-4">
         <span
           dangerouslySetInnerHTML={{
-            __html: subHeader || "Software Engineering Student crafting digital experiences<br />with passion and precision"
+            __html: subHeader || "Computer Science Student crafting digital experiences<br />with passion and precision"
           }}
         />
       </div>

@@ -1,6 +1,49 @@
 import BlogClient from './BlogClient';
 import { PostData } from "@/api/posts";
 import axios from 'axios';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Blog - Nathan Campbell's Technical Insights",
+  description: "Read Nathan Campbell's blog featuring technical articles, tutorials, and insights on Computer Science, web development, React, Vue, and modern programming practices.",
+  keywords: [
+    "Nathan Campbell Blog",
+    "Computer Science Blog",
+    "Web Development Articles",
+    "React Tutorials",
+    "Vue.js Articles",
+    "Programming Insights",
+    "Technical Writing",
+    "Development Blog",
+    "JavaScript Articles",
+    "TypeScript Tutorials",
+    "Frontend Development",
+    "Software Development Tips"
+  ],
+  openGraph: {
+    title: "Blog - Nathan Campbell's Technical Insights",
+    description: "Read Nathan Campbell's blog featuring technical articles, tutorials, and insights on Computer Science and web development.",
+    url: "https://nathan.binarybridges.ca/main/blog",
+    type: "website",
+    images: [
+      {
+        url: "/blog-og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Nathan Campbell - Technical Blog",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog - Nathan Campbell's Technical Insights",
+    description: "Read Nathan Campbell's blog featuring technical articles, tutorials, and insights on Computer Science and web development.",
+    images: ["/blog-og-image.jpg"],
+  },
+  alternates: {
+    canonical: "https://nathan.binarybridges.ca/main/blog",
+  },
+};
 
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
@@ -75,7 +118,7 @@ export default async function Blog() {
       {/* Header Section */}
       <div className="text-center mb-8 sm:mb-12 mt-4 sm:mt-0">
         <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
-          Thoughts, tutorials, and insights from my journey in software engineering
+          Thoughts, tutorials, and insights from my journey in Computer Science
         </p>
       </div>
 

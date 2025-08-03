@@ -2,12 +2,52 @@ import { getAboutMe } from "@/api/aboutMe";
 import ContactCard from "@/components/ui/ContactCard";
 import SkillTag from "@/components/ui/SkillTag";
 import Image from 'next/image';
+import { Metadata } from 'next';
 
 interface SkillTag {
     id: number;
     skill: string;
     mainColour: string;
 }
+
+export const metadata: Metadata = {
+  title: "About Nathan Campbell - Computer Science Student",
+  description: "Learn about Nathan Campbell, a passionate Computer Science student with expertise in React, Vue, and modern web technologies. Discover his journey, skills, and passion for creating innovative digital solutions.",
+  keywords: [
+    "Nathan Campbell",
+    "About",
+    "Computer Science Student",
+    "React Developer",
+    "Vue Developer",
+    "Web Development",
+    "Personal Story",
+    "Technical Skills",
+    "Contact Information"
+  ],
+  openGraph: {
+    title: "About Nathan Campbell - Computer Science Student",
+    description: "Learn about Nathan Campbell, a passionate Computer Science student with expertise in React, Vue, and modern web technologies.",
+    url: "https://nathan.binarybridges.ca/main/about-me",
+    type: "profile",
+    images: [
+      {
+        url: "/about-og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Nathan Campbell - About Page",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Nathan Campbell - Computer Science Student",
+    description: "Learn about Nathan Campbell, a passionate Computer Science student with expertise in React, Vue, and modern web technologies.",
+    images: ["/about-og-image.jpg"],
+  },
+  alternates: {
+    canonical: "https://nathan.binarybridges.ca/main/about-me",
+  },
+};
 
 export default async function AboutMe() {
     let aboutMeData = null;
@@ -68,7 +108,7 @@ export default async function AboutMe() {
 
                     <div className="space-y-4 mb-6 sm:mb-8">
                         <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
-                            {aboutMeData?.topDescription || "I'm a passionate Software Engineering student with a love for creating innovative digital solutions. My journey in tech began with curiosity and has evolved into a dedication to crafting meaningful user experiences through clean, efficient code."}
+                            {aboutMeData?.topDescription || "I'm a passionate Computer Science student with a love for creating innovative digital solutions. My journey in tech began with curiosity and has evolved into a dedication to crafting meaningful user experiences through clean, efficient code."}
                         </p>
 
                         <p className="text-base sm:text-lg text-gray-700 leading-relaxed">

@@ -2,6 +2,49 @@ import ProjectSlide from "@/components/project-slide/ProjectSlide";
 import ProjectImpact from "@/components/project-impact/ProjectImpact";
 import CallToAction from "@/components/call-to-action/CallToAction";
 import { PostData } from "@/api/posts";
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Projects - Nathan Campbell's Development Portfolio",
+  description: "Explore Nathan Campbell's software development projects showcasing expertise in React, Vue, Next.js, and modern web technologies. View live demos, source code, and technical implementations.",
+  keywords: [
+    "Nathan Campbell Projects",
+    "Software Development Portfolio",
+    "React Projects",
+    "Vue Projects",
+    "Next.js Applications",
+    "Web Development",
+    "Frontend Projects",
+    "Full Stack Development",
+    "JavaScript Projects",
+    "TypeScript Projects",
+    "Open Source",
+    "Live Demos"
+  ],
+  openGraph: {
+    title: "Projects - Nathan Campbell's Development Portfolio",
+    description: "Explore Nathan Campbell's software development projects showcasing expertise in React, Vue, Next.js, and modern web technologies.",
+    url: "https://nathan.binarybridges.ca/main/projects",
+    type: "website",
+    images: [
+      {
+        url: "/projects-og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Nathan Campbell - Projects Portfolio",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Projects - Nathan Campbell's Development Portfolio",
+    description: "Explore Nathan Campbell's software development projects showcasing expertise in React, Vue, Next.js, and modern web technologies.",
+    images: ["/projects-og-image.jpg"],
+  },
+  alternates: {
+    canonical: "https://nathan.binarybridges.ca/main/projects",
+  },
+};
 
 const STRAPI_URL = process.env.STRAPI_API_URL;
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN;

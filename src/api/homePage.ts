@@ -67,7 +67,7 @@ export async function getHomePage(): Promise<HomePageResponse> {
         id: 1,
         documentId: "fallback",
         header: "Welcome to<br />Nathan's Portfolio",
-        subHeader: "Software Engineering Student crafting digital experiences<br />with passion and precision",
+        subHeader: "Computer Science Student crafting digital experiences<br />with passion and precision",
         resume: {
           id: 1,
           documentId: "fallback-resume",
@@ -75,7 +75,7 @@ export async function getHomePage(): Promise<HomePageResponse> {
           alternativeText: "Resume",
           caption: "Resume",
           size: 0,
-          url: "/main/about-me",
+          url: "https://positive-life-875d223e2a.media.strapiapp.com/Master_Resume_website_66f649901d.pdf",
           previewUrl: null,
         },
         skillTags: [
