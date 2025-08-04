@@ -20,14 +20,17 @@ export default function SkillTag({
     md: 'px-4 py-2 text-sm'
   };
 
+  // Ensure mainColour is a valid hex color
+  const safeMainColour = mainColour && mainColour.startsWith('#') ? mainColour : '#6366f1';
+
   if (variant === 'blog') {
     // Blog style tags - colored background with white text
     return (
       <span
         className={`${sizeClasses[size]} rounded-full font-medium text-white inline-block`}
         style={{
-          color: mainColour || '#fff',
-        backgroundColor: toPastelColor(mainColour || '#FF746C')
+          color: safeMainColour,
+          backgroundColor: toPastelColor(safeMainColour)
         }}
       >
         {text}
@@ -40,8 +43,8 @@ export default function SkillTag({
     <span
       className={`${sizeClasses[size]} rounded-full font-medium inline-block`}
       style={{
-        color: darkText ? toDarkTextColor(mainColour || '#FF746C') : (mainColour || '#fff'),
-        backgroundColor: toPastelColor(mainColour || '#FF746C')
+        color: darkText ? toDarkTextColor(safeMainColour) : safeMainColour,
+        backgroundColor: toPastelColor(safeMainColour)
       }}
     >
       {text}

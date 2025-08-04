@@ -1,11 +1,13 @@
 'use client'
 
 import { usePathname } from "next/navigation"
-import { Suspense } from "react"
 import './index.css'
 
-// Component that uses usePathname - needs Suspense
-function MainLayoutContent({ children }: { children: React.ReactNode }) {
+export default function MainLayout({
+    children
+}: {
+    children: React.ReactNode
+}) {
     const pathname = usePathname()
 
     let heading;
@@ -56,27 +58,5 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                 {children}
             </div>
         </div>
-    )
-}
-
-// Main export with Suspense wrapper
-export default function MainLayout({
-    children
-}: {
-    children: React.ReactNode
-}) {
-    return (
-        <Suspense fallback={
-            <div className="relative min-h-screen pt-16 bg-[#f8f7fc]">
-                <div className="flex items-center justify-center py-20">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-gray-600">Loading...</p>
-                    </div>
-                </div>
-            </div>
-        }>
-            <MainLayoutContent>{children}</MainLayoutContent>
-        </Suspense>
     )
 }
