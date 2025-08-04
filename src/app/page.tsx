@@ -1,25 +1,8 @@
 import HomeClient from "./HomeClient";
 import { getHomePage } from "@/api/homePage";
+import { checkStrapiHealth } from "@/api/strapi";
 import ErrorBoundary from "@/components/error/ErrorBoundary";
 import ApiErrorPage from "@/components/error/ApiErrorPage";
-
-// Check if we're in a state where API is likely down
-async function checkApiHealth(): Promise<boolean> {
-  try {
-    // Simple health check - just try to reach the API
-    const response = await fetch(`${process.env.STRAPI_API_URL}/posts?pagination[pageSize]=1`, {
-      headers: {
-        'Authorization': `Bearer ${process.env.STRAPI_TOKEN}`,
-      },
-      // Short timeout for health check
-      signal: AbortSignal.timeout(5000),
-    });
-    return response.ok;
-  } catch (error) {
-    console.error('API health check failed:', error);
-    return false;
-  }
-}
 
 export default async function Home() {
   try {
@@ -30,7 +13,7 @@ export default async function Home() {
 
     if (isUsingFallbackData) {
       // Double-check API health
-      const apiHealthy = await checkApiHealth();
+      const apiHealthy = await checkStrapiHealth();
 
       if (!apiHealthy) {
         return (

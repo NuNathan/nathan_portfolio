@@ -1,16 +1,11 @@
 import BlogDetailServer from './BlogDetailServer';
 import { PostData } from '@/api/posts';
+import { getStrapiPostBySlug } from '@/api/strapi';
 import { notFound } from 'next/navigation';
-import { formatDateConsistently } from '@/utils/dateUtils';
-import axios from 'axios';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
 
 // Version 2.1 - Fixed hydration issues
-
-const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
-const STRAPI_URL = process.env.STRAPI_API_URL;
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 
 // Disable all caching for this page
 export const dynamic = 'force-dynamic';
@@ -19,35 +14,7 @@ export const revalidate = 0;
 // Function to fetch post data for metadata
 async function getPostData(slug: string): Promise<PostData | null> {
   try {
-    const queryParams = new URLSearchParams();
-    queryParams.append('populate', '*');
-    queryParams.append('filters[slug][$eq]', slug);
-
-    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-      timeout: 20000,
-    });
-
-    const data = response.data;
-    if (data.data && data.data.length > 0) {
-      const post = data.data[0];
-
-      // Handle img object with url property
-      if (post.img && typeof post.img === 'object' && post.img.url) {
-        const imgUrl = post.img.url;
-        post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_MEDIA_URL}${imgUrl}`;
-      } else if (post.img && typeof post.img === 'string' && !post.img.startsWith('http')) {
-        post.img = `${STRAPI_MEDIA_URL}${post.img}`;
-      }
-
-      return post;
-    }
-    return null;
+    return await getStrapiPostBySlug(slug);
   } catch (error) {
     console.error('Error fetching post data for metadata:', error);
     return null;
@@ -130,17 +97,10 @@ export async function generateStaticParams() {
 // Function to get author headshot from about-me data
 async function getAuthorHeadshot(): Promise<string | null> {
   try {
-    const response = await axios.get(`${STRAPI_URL}/about-me?populate=headshot`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-      },
-    });
-
-    const headshot = response.data?.data?.headshot;
-    if (headshot && headshot.url) {
-      return headshot.url.startsWith('http') ? headshot.url : `${STRAPI_MEDIA_URL}${headshot.url}`;
-    }
-    return null;
+    const { getAboutMe } = await import('@/api/aboutMe');
+    const response = await getAboutMe();
+    const headshot = response.data?.headshot;
+    return headshot?.url || null;
   } catch (error) {
     console.error('Error fetching author headshot:', error);
     return null;
@@ -151,76 +111,15 @@ export default async function BlogDetailPage(props: unknown) {
   const { slug } = await (props as { params: Promise<{ slug: string }> }).params;
 
   try {
-    // Call Strapi directly from server-side instead of going through Next.js API route
-    const queryParams = new URLSearchParams();
-    queryParams.append('populate', '*'); // This will include content field and all other fields
-    queryParams.append('filters[slug][$eq]', slug);
+    // Get post data using centralized API
+    const post = await getStrapiPostBySlug(slug);
 
-    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-      timeout: 20000, // 20 second timeout
-    });
-
-    const data = response.data;
-    if (data.data && data.data.length > 0) {
-      const post = data.data[0];
-
-      // Handle img object with url property
-      if (post.img && typeof post.img === 'object' && post.img.url) {
-        const imgUrl = post.img.url;
-        post.img = imgUrl.startsWith('http') ? imgUrl : `${STRAPI_MEDIA_URL}${imgUrl}`;
-      } else if (post.img && typeof post.img === 'string' && !post.img.startsWith('http')) {
-        post.img = `${STRAPI_MEDIA_URL}${post.img}`;
+    if (post) {
+      // Handle author avatar - if no avatar, try to get the headshot from about-me data
+      if (post.author && (!post.author.avatar || post.author.avatar === '')) {
+        const headshot = await getAuthorHeadshot();
+        post.author.avatar = headshot || '';
       }
-
-      // Handle author avatar
-      if (post.author) {
-        if (post.author.avatar && typeof post.author.avatar === 'object' && post.author.avatar.url) {
-          const avatarUrl = post.author.avatar.url;
-          post.author.avatar = avatarUrl.startsWith('http')
-            ? avatarUrl
-            : `${STRAPI_MEDIA_URL}${avatarUrl}`;
-        } else {
-          // If no avatar, try to get the headshot from about-me data
-          const headshot = await getAuthorHeadshot();
-          post.author.avatar = headshot || '';
-        }
-      }
-
-      // Transform skillTags to tags with correct structure
-      if (post.skillTags && Array.isArray(post.skillTags)) {
-        post.tags = post.skillTags.map((skillTag: any) => ({
-          id: skillTag.id,
-          text: skillTag.skill,
-          color: skillTag.mainColour
-        }));
-        delete post.skillTags; // Remove original field
-      } else {
-        post.tags = []; // Ensure tags is always an array
-      }
-
-      // Transform demo/github/live fields to links object
-      post.links = {
-        demo: post.demo || undefined,
-        github: post.github || undefined,
-        live: post.live || undefined
-      };
-
-      // Clean up original fields
-      delete post.demo;
-      delete post.github;
-      delete post.live;
-
-      // Ensure date field is properly formatted consistently for server/client
-      post.date = formatDateConsistently(post.completionDate);
-
-      // Ensure views field is properly handled
-      post.views = post.views || 0;
 
       const postData: PostData = post;
 

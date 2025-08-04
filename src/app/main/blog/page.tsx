@@ -1,7 +1,6 @@
 import BlogClient from './BlogClient';
 import { PostData } from "@/api/posts";
-import { formatDateConsistently } from "@/utils/dateUtils";
-import axios from 'axios';
+import { getStrapiPosts } from "@/api/strapi";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -46,10 +45,6 @@ export const metadata: Metadata = {
   },
 };
 
-const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
-const STRAPI_URL = process.env.STRAPI_API_URL;
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
-
 // Disable all caching for this page
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -61,58 +56,15 @@ export default async function Blog() {
   let totalItems = 0;
 
   try {
-    const queryParams = new URLSearchParams();
-    queryParams.append('populate', '*');
-    queryParams.append('pagination[page]', '1');
-    queryParams.append('pagination[pageSize]', '6');
-    queryParams.append('sort[0]', 'completionDate:desc'); // Latest first
-
-    const response = await axios.get(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-      timeout: 20000,
+    const response = await getStrapiPosts({
+      page: 1,
+      pageSize: 6,
+      sortBy: 'latest'
     });
 
-    if (response.data && response.data.data) {
-      // Transform the data to match our expected format
-      initialPosts = response.data.data.map((post: any) => ({
-        ...post,
-        // Handle img object with url property
-        img: post.img && typeof post.img === 'object' && post.img.url
-          ? (post.img.url.startsWith('http') ? post.img.url : `${STRAPI_MEDIA_URL}${post.img.url}`)
-          : (post.img && typeof post.img === 'string' && !post.img.startsWith('http')
-             ? `${STRAPI_MEDIA_URL}${post.img}`
-             : post.img),
-        // Transform skillTags to tags with correct structure
-        tags: post.skillTags && Array.isArray(post.skillTags)
-          ? post.skillTags.map((skillTag: any) => ({
-              id: skillTag.id,
-              text: skillTag.skill,
-              color: skillTag.mainColour
-            }))
-          : [],
-        // Transform demo/github/live fields to links object
-        links: {
-          demo: post.demo || undefined,
-          github: post.github || undefined,
-          live: post.live || undefined
-        },
-        // Ensure date field is properly formatted consistently for server/client
-        date: formatDateConsistently(post.completionDate),
-        // Ensure views field is properly handled
-        views: post.views || 0
-      }));
-
-      // Get pagination info
-      if (response.data.meta && response.data.meta.pagination) {
-        totalPages = response.data.meta.pagination.pageCount;
-        totalItems = response.data.meta.pagination.total;
-      }
-    }
+    initialPosts = response.data;
+    totalPages = response.meta.pagination.pageCount;
+    totalItems = response.meta.pagination.total;
   } catch (error) {
     console.error('Failed to fetch initial blog posts:', error);
   }

@@ -1,9 +1,6 @@
-import axios from 'axios';
+import { strapiGet } from '@/utils/api-client';
+import { transformImageUrl } from './strapi';
 import { analyzeError, isApiDownError } from '@/utils/error-handling';
-
-const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
-const STRAPI_URL = process.env.STRAPI_API_URL;
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
 
 export interface SkillTag {
   id: number;
@@ -39,17 +36,12 @@ export interface HomePageResponse {
 
 export async function getHomePage(): Promise<HomePageResponse> {
   try {
-    const response = await axios.get(`${STRAPI_URL}/home-page?populate=*`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-      },
-      timeout: 10000, // 10 second timeout
-    });
+    const response = await strapiGet('/home-page?populate=*');
 
     // Transform the response to include full URLs for file assets
     const data = response.data;
-    if (data.data?.resume?.url && !data.data.resume.url.startsWith('http')) {
-      data.data.resume.url = `${STRAPI_MEDIA_URL}${data.data.resume.url}`;
+    if (data.data?.resume?.url) {
+      data.data.resume.url = transformImageUrl(data.data.resume.url);
     }
 
     return data;

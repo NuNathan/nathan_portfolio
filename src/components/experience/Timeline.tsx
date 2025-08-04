@@ -152,7 +152,7 @@ export default function Timeline({ data }: TimelineProps) {
                 return (
                   <div key={`${item.type}-${item.title || item.school}-${item.startDate}`} className="relative flex items-center">
                     {/* Month dot centered on card */}
-                    <div className="absolute left-[30px] md:left-[200px] w-2 h-2 md:w-3 md:h-3 bg-white border-2 rounded-full z-10 -ml-1 md:-ml-1.5" style={{ borderColor: color, marginLeft: '-2px' }}>
+                    <div className="absolute left-[30px] md:left-[200px] w-2 h-2 md:w-3 md:h-3 bg-white border-2 rounded-full z-10 -ml-1 md:-ml-1.5" style={{ borderColor: color}}>{/**, marginLeft: '-2px'  */}
                       {/* <div className="absolute inset-0.5 rounded-full" style={{ backgroundColor: color }}></div> */}
                     </div>
 

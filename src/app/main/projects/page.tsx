@@ -2,7 +2,7 @@ import ProjectSlide from "@/components/project-slide/ProjectSlide";
 import ProjectImpact from "@/components/project-impact/ProjectImpact";
 import CallToAction from "@/components/call-to-action/CallToAction";
 import { PostData } from "@/api/posts";
-import { formatDateConsistently } from "@/utils/dateUtils";
+import { getStrapiPosts } from "@/api/strapi";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -47,65 +47,22 @@ export const metadata: Metadata = {
   },
 };
 
-const STRAPI_URL = process.env.STRAPI_API_URL;
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
-const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
-
 // Disable all caching for this page
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function Projects() {
-  // Fetch project posts directly from Strapi
+  // Fetch project posts using centralized API
   let projectPosts: PostData[] = [];
   try {
-    const queryParams = new URLSearchParams();
-    queryParams.append('populate', '*');
-    queryParams.append('pagination[page]', '1');
-    queryParams.append('pagination[pageSize]', '100');
-    queryParams.append('sort[0]', 'completionDate:desc');
-    queryParams.append('filters[type][$eq]', 'project');
-
-    const response = await fetch(`${STRAPI_URL}/posts?${queryParams.toString()}`, {
-      headers: {
-        'Authorization': `Bearer ${STRAPI_TOKEN}`,
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-      cache: 'no-store', // Next.js specific - disable all caching
+    const response = await getStrapiPosts({
+      page: 1,
+      pageSize: 100,
+      type: 'project',
+      sortBy: 'latest'
     });
 
-    if (response.ok) {
-      const data = await response.json();
-
-      // Transform the data to match our expected format
-      projectPosts = data.data.map((post: any) => ({
-        ...post,
-        // Transform img object with url property
-        img: post.img && typeof post.img === 'object' && post.img.url
-          ? (post.img.url.startsWith('http') ? post.img.url : `${STRAPI_MEDIA_URL}${post.img.url}`)
-          : (post.img && typeof post.img === 'string' && !post.img.startsWith('http')
-             ? `${STRAPI_MEDIA_URL}${post.img}`
-             : post.img),
-        // Transform skillTags to tags
-        tags: post.skillTags ? post.skillTags.map((skillTag: any) => ({
-          id: skillTag.id,
-          text: skillTag.skill,
-          color: skillTag.mainColour
-        })) : [],
-        // Transform demo/github/live fields to links object
-        links: {
-          demo: post.demo || undefined,
-          github: post.github || undefined,
-          live: post.live || undefined
-        },
-        // Format date consistently for server/client
-        date: formatDateConsistently(post.completionDate),
-        // Ensure views field is properly handled
-        views: post.views || 0
-      }));
-    }
+    projectPosts = response.data;
   } catch (error) {
     console.error('Failed to fetch project posts:', error);
   }

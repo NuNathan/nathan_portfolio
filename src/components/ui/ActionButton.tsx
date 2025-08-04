@@ -84,7 +84,7 @@ export default function ActionButton({
     `,
     custom: `
       hover:shadow-lg
-      before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent
+      before:absolute before:inset-0 before:bg-gradient-to-r before:from-gray-100/30 before:to-transparent
       before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100
     `
   };

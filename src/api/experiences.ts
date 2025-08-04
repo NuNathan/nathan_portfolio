@@ -1,7 +1,4 @@
-import axios from 'axios';
-
-const STRAPI_URL = process.env.STRAPI_API_URL;
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN;
+import { strapiGet } from '@/utils/api-client';
 
 type ExperienceItem = {
   id: number;
@@ -59,11 +56,7 @@ type ExperiencePageResponse = {
 
 export async function getExperiencePage() {
   try {
-    const response = await axios.get(`${STRAPI_URL}/experience-page?populate[experiences][populate]=content&populate[skill_categories][populate]=skills`, {
-      headers: {
-        Authorization: `Bearer ${STRAPI_TOKEN}`,
-      },
-    });
+    const response = await strapiGet('/experience-page?populate[experiences][populate]=content&populate[skill_categories][populate]=skills');
 
     const data: ExperiencePageResponse = response.data;
 

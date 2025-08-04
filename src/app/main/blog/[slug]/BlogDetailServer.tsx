@@ -1,6 +1,7 @@
 import SkillTag from "@/components/ui/SkillTag";
 import ActionButton from "@/components/ui/ActionButton";
-import { PostData, getRelatedPosts } from "@/api/posts";
+import { PostData } from "@/api/posts";
+import { getStrapiRelatedPosts } from "@/api/strapi";
 import ProjectSlide from "@/components/project-slide/ProjectSlide";
 import Image from 'next/image';
 import Link from 'next/link';
@@ -39,7 +40,7 @@ export default async function BlogDetailServer({ slug, postData }: BlogDetailSer
   };
 
   // Fetch related posts based on shared tags
-  const relatedPosts = await getRelatedPosts(slug, postData.tags || []);
+  const relatedPosts = await getStrapiRelatedPosts(slug, postData.tags || []);
 
   return (
     <div className="min-h-screen bg-[#f8f7fc]">
