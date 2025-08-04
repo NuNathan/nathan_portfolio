@@ -1,7 +1,7 @@
 'use client';
 
 import SkillTag from "@/components/ui/SkillTag";
-import { usePathname } from 'next/navigation';
+import ActionButton from "@/components/ui/ActionButton";
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -20,6 +20,7 @@ interface ProjectSlideProps {
     views?: number;
     readTime?: string;
     slug?: string;
+    source?: 'projects' | 'blog'; // Add source prop to avoid usePathname hydration issues
 }
 
 export default function ProjectSlide({
@@ -32,12 +33,9 @@ export default function ProjectSlide({
     date,
     views = 0,
     readTime,
-    slug
+    slug,
+    source = 'blog' // Default to blog to avoid hydration issues
 }: ProjectSlideProps) {
-    const pathname = usePathname();
-
-    // Determine source based on current pathname for URL construction
-    const source = pathname.includes('/projects') ? 'projects' : 'blog';
     const href = slug ? `/main/blog/${slug}?from=${source}` : '#';
 
     return (
@@ -93,17 +91,15 @@ export default function ProjectSlide({
 
                 {/* Launch Demo button - moved above date/view/time section */}
                 {type === 'project' && links.demo && links.demo !== '' && links.demo !== '#' && (
-                    <div className="mb-4">
-                        <button
-                            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all duration-200"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                window.open(links.demo, '_blank', 'noopener,noreferrer');
-                            }}
+                    <div className="mb-4" onClick={(e) => e.stopPropagation()}>
+                        <ActionButton
+                            variant="primary"
+                            size="md"
+                            href={links.demo}
+                            external={true}
                         >
                             Launch Demo
-                        </button>
+                        </ActionButton>
                     </div>
                 )}
 

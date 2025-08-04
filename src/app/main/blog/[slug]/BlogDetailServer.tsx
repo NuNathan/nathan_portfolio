@@ -1,6 +1,7 @@
 import SkillTag from "@/components/ui/SkillTag";
-import RichTextRenderer from "@/components/ui/RichTextRenderer";
-import { PostData } from "@/api/posts";
+import ActionButton from "@/components/ui/ActionButton";
+import { PostData, getRelatedPosts } from "@/api/posts";
+import ProjectSlide from "@/components/project-slide/ProjectSlide";
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -10,7 +11,7 @@ interface BlogDetailServerProps {
 }
 
 // Server-side only version to avoid hydration issues
-export default function BlogDetailServer({ slug, postData }: BlogDetailServerProps) {
+export default async function BlogDetailServer({ slug, postData }: BlogDetailServerProps) {
   // Simple breadcrumb - always go back to blog
   const breadcrumbText = 'Blog';
   const backUrl = '/main/blog';
@@ -36,6 +37,9 @@ export default function BlogDetailServer({ slug, postData }: BlogDetailServerPro
     slug: postData.slug || slug,
     content: postData.content || `<p>${postData.description}</p>`,
   };
+
+  // Fetch related posts based on shared tags
+  const relatedPosts = await getRelatedPosts(slug, postData.tags || []);
 
   return (
     <div className="min-h-screen bg-[#f8f7fc]">
@@ -93,55 +97,114 @@ export default function BlogDetailServer({ slug, postData }: BlogDetailServerPro
 
             {/* Meta Info */}
             <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-gray-600 mb-8 sm:mb-12">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
                 <Image
                   src={content.author.avatar}
                   alt={content.author.name}
-                  width={32}
-                  height={32}
-                  className="rounded-full"
+                  width={48}
+                  height={48}
+                  className="rounded-full object-cover w-12 h-12"
                 />
-                <div>
-                  <p className="font-medium text-gray-900">{content.author.name}</p>
-                  <p className="text-xs">{content.author.title}</p>
+                <div className="flex flex-col justify-center">
+                  <p className="font-medium text-gray-900 leading-tight" style={{marginBottom: 0, lineHeight: 1}}>{content.author.name}</p>
+                  <p className="text-gray-600 leading-tight" style={{marginBottom: 0, fontSize: '0.85rem'}}>{content.author.title}</p>
                 </div>
               </div>
-              <span>•</span>
-              <span>{content.date}</span>
-              <span>•</span>
-              <span>{content.views} views</span>
-              <span>•</span>
-              <span>{content.readTime}</span>
+
+              {/* Date */}
+              <div className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd"/>
+                </svg>
+                <span>{content.date}</span>
+              </div>
+
+              {/* Views */}
+              <div className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                </svg>
+                <span>{content.views} views</span>
+              </div>
+
+              {/* Read time */}
+              <div className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
+                </svg>
+                <span>{content.readTime}</span>
+              </div>
             </div>
 
             {/* Rich Text Content */}
-            <div className="prose prose-lg max-w-none mb-8 sm:mb-12">
-              <RichTextRenderer content={content.content} />
-            </div>
+            <div
+              className="mb-8 sm:mb-12"
+              dangerouslySetInnerHTML={{ __html: content.content }}
+              style={{
+                fontSize: '1.125rem',
+                lineHeight: '1.75',
+                color: '#374151'
+              }}
+            />
+            <style dangerouslySetInnerHTML={{
+              __html: `
+                .mb-8 h1 {
+                  font-size: 2.25rem;
+                  font-weight: 700;
+                  line-height: 1.2;
+                  margin-bottom: 1.5rem;
+                  margin-top: 2rem;
+                  color: #111827;
+                }
+                .mb-8 h2 {
+                  font-size: 1.875rem;
+                  font-weight: 700;
+                  line-height: 1.3;
+                  margin-bottom: 1.25rem;
+                  margin-top: 1.75rem;
+                  color: #111827;
+                }
+                .mb-8 h3 {
+                  font-size: 1.5rem;
+                  font-weight: 600;
+                  line-height: 1.4;
+                  margin-bottom: 1rem;
+                  margin-top: 1.5rem;
+                  color: #111827;
+                }
+                .mb-8 p {
+                  font-size: 1.125rem;
+                  line-height: 1.75;
+                  margin-bottom: 1rem;
+                  color: #374151;
+                }
+              `
+            }} />
 
             {/* Action Buttons for Projects */}
             {content.type === 'project' && content.links && (
               <div className="mb-6 sm:mb-8">
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   {content.links.demo && (
-                    <a
+                    <ActionButton
+                      variant="primary"
                       href={content.links.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+                      external={true}
+                      size="md"
                     >
                       Live Demo
-                    </a>
+                    </ActionButton>
                   )}
                   {content.links.github && (
-                    <a
+                    <ActionButton
+                      variant="github"
                       href={content.links.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-900 transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base"
+                      external={true}
+                      size="md"
                     >
                       View Code
-                    </a>
+                    </ActionButton>
                   )}
                 </div>
               </div>
@@ -149,20 +212,43 @@ export default function BlogDetailServer({ slug, postData }: BlogDetailServerPro
           </div>
         </div>
 
-        {/* Related Content Section - Static for now */}
+        {/* Related Content Section */}
         <div className="mt-12 sm:mt-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">
             Related Content
           </h2>
-          <div className="text-center py-8">
-            <p className="text-gray-600">Check out more posts on the blog page.</p>
-            <Link 
-              href="/main/blog"
-              className="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              View All Posts
-            </Link>
-          </div>
+
+          {relatedPosts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {relatedPosts.map((post) => (
+                <ProjectSlide
+                  key={post.id}
+                  title={post.title}
+                  description={post.description}
+                  img={post.img}
+                  tags={post.tags}
+                  type={post.type}
+                  date={post.date}
+                  views={post.views}
+                  readTime={post.readTime}
+                  links={post.links}
+                  slug={post.slug}
+                  source="blog"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">Check out more posts on the blog page.</p>
+              <ActionButton
+                variant="primary"
+                href="/main/blog"
+                size="md"
+              >
+                View All Posts
+              </ActionButton>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import { formatTimelineDate } from '@/utils/dateUtils';
+
 interface TimelineProps {
   data: {
     experiences: Array<{
@@ -48,33 +50,8 @@ export default function Timeline({ data }: TimelineProps) {
     );
   }
 
-  // Format date for display (e.g., "Jan 2023")
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'Invalid Date';
-
-    // Handle YYYY-MM format specifically
-    if (dateString.match(/^\d{4}-\d{2}$/)) {
-      const [year, month] = dateString.split('-');
-      const date = new Date(parseInt(year), parseInt(month) - 1, 1); // Month is 0-based in Date constructor
-
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-        return 'Invalid Date';
-      }
-
-      return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    }
-
-    // Handle other date formats
-    const date = new Date(dateString);
-
-    // Check if date is valid
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
-
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  };
+  // Use consistent date formatting to avoid hydration mismatches
+  const formatDate = formatTimelineDate;
 
   // Format date range for display
   const formatDateRange = (startDate: string, endDate: string | null) => {
@@ -175,7 +152,7 @@ export default function Timeline({ data }: TimelineProps) {
                 return (
                   <div key={`${item.type}-${item.title || item.school}-${item.startDate}`} className="relative flex items-center">
                     {/* Month dot centered on card */}
-                    <div className="absolute left-[30px] md:left-[204px] transform -translate-x-1/2 w-2 h-2 md:w-3 md:h-3 bg-white border-2 rounded-full z-10" style={{ borderColor: color }}>
+                    <div className="absolute left-[30px] md:left-[200px] w-2 h-2 md:w-3 md:h-3 bg-white border-2 rounded-full z-10 -ml-1 md:-ml-1.5" style={{ borderColor: color, marginLeft: '-2px' }}>
                       {/* <div className="absolute inset-0.5 rounded-full" style={{ backgroundColor: color }}></div> */}
                     </div>
 

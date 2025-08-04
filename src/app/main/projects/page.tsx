@@ -2,6 +2,7 @@ import ProjectSlide from "@/components/project-slide/ProjectSlide";
 import ProjectImpact from "@/components/project-impact/ProjectImpact";
 import CallToAction from "@/components/call-to-action/CallToAction";
 import { PostData } from "@/api/posts";
+import { formatDateConsistently } from "@/utils/dateUtils";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -99,12 +100,8 @@ export default async function Projects() {
           github: post.github || undefined,
           live: post.live || undefined
         },
-        // Format date
-        date: post.completionDate ? new Date(post.completionDate).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        }) : undefined,
+        // Format date consistently for server/client
+        date: formatDateConsistently(post.completionDate),
         // Ensure views field is properly handled
         views: post.views || 0
       }));
@@ -136,6 +133,7 @@ export default async function Projects() {
             date={project.date}
             views={project.views}
             readTime={project.readTime}
+            source="projects"
           />
         ))}
       </div>

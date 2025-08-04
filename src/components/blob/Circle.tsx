@@ -26,11 +26,16 @@ export default function Circle({
     const { circles } = useBouncingCircles();
     const ref = useRef<HTMLSpanElement | null>(null);
     const id = useRef(uuidv4());
+
+    // Use deterministic velocity direction based on initial position to avoid hydration mismatches
+    const deterministicVx = ((initialX * 31 + initialY * 17) % 100) > 50 ? 1 : -1;
+    const deterministicVy = ((initialX * 17 + initialY * 31) % 100) > 50 ? 1 : -1;
+
     const pos = useRef({
         x: initialX,
         y: initialY,
-        vx: speedIn * (Math.random() > 0.5 ? 1 : -1),
-        vy: speedIn * (Math.random() > 0.5 ? 1 : -1),
+        vx: speedIn * deterministicVx,
+        vy: speedIn * deterministicVy,
     });
     const [size] = useState(radius * 2) // Fixed size based on radius
 

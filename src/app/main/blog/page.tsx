@@ -1,5 +1,6 @@
 import BlogClient from './BlogClient';
 import { PostData } from "@/api/posts";
+import { formatDateConsistently } from "@/utils/dateUtils";
 import axios from 'axios';
 import { Metadata } from 'next';
 
@@ -100,12 +101,8 @@ export default async function Blog() {
           github: post.github || undefined,
           live: post.live || undefined
         },
-        // Ensure date field is properly formatted
-        date: post.completionDate ? new Date(post.completionDate).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        }) : undefined,
+        // Ensure date field is properly formatted consistently for server/client
+        date: formatDateConsistently(post.completionDate),
         // Ensure views field is properly handled
         views: post.views || 0
       }));

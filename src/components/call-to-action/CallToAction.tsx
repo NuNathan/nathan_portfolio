@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import ActionButton from '@/components/ui/ActionButton';
 
 export default function CallToAction() {
 
@@ -12,13 +12,15 @@ export default function CallToAction() {
                     Let's bring your next project to life together
                 </p>
 
-                <Link
+                <ActionButton
+                    variant="custom"
                     href="/main/about-me"
-                    className="inline-block px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                    prefetch={true}
+                    size="lg"
+                    customBackground="white"
+                    className="text-blue-600 font-semibold hover:bg-gray-100"
                 >
                     Get in Touch
-                </Link>
+                </ActionButton>
             </div>
         </div>
     );

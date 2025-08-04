@@ -1,3 +1,5 @@
+import { formatTimelineDate } from '@/utils/dateUtils';
+
 interface TimelineCardProps {
   timelineMonth: {
     year: number;
@@ -40,33 +42,8 @@ const placedCardPositions: {
 export default function TimelineCard({ timelineMonth, allItems, timelineMonths, placedCards }: TimelineCardProps) {
   const now = new Date(); // Current date used for ongoing items
 
-  // Format date for display (e.g., "Jan 2023")
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'Invalid Date';
-
-    // Handle YYYY-MM format specifically
-    if (dateString.match(/^\d{4}-\d{2}$/)) {
-      const [year, month] = dateString.split('-');
-      const date = new Date(parseInt(year), parseInt(month) - 1, 1); // Month is 0-based in Date constructor
-
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-        return 'Invalid Date';
-      }
-
-      return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    }
-
-    // Handle other date formats
-    const date = new Date(dateString);
-
-    // Check if date is valid
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
-
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-  };
+  // Use consistent date formatting to avoid hydration mismatches
+  const formatDate = formatTimelineDate;
 
   // Format date range for display
   const formatDateRange = (startDate: string, endDate: string | null) => {

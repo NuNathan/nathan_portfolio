@@ -136,6 +136,7 @@ export default function BlogClient({
                 readTime={item.readTime}
                 links={item.links}
                 slug={item.slug}
+                source="blog"
               />
             ))
           ) : (

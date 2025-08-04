@@ -1,6 +1,7 @@
 import BlogDetailServer from './BlogDetailServer';
 import { PostData } from '@/api/posts';
 import { notFound } from 'next/navigation';
+import { formatDateConsistently } from '@/utils/dateUtils';
 import axios from 'axios';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
@@ -215,15 +216,8 @@ export default async function BlogDetailPage(props: unknown) {
       delete post.github;
       delete post.live;
 
-      // Ensure date field is properly formatted
-      if (post.completionDate) {
-        const date = new Date(post.completionDate);
-        post.date = date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
-      }
+      // Ensure date field is properly formatted consistently for server/client
+      post.date = formatDateConsistently(post.completionDate);
 
       // Ensure views field is properly handled
       post.views = post.views || 0;

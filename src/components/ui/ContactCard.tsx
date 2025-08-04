@@ -1,12 +1,11 @@
-import CustomButton from './CustomButton';
-import Link from 'next/link';
+import ActionButton from './ActionButton';
 
 interface ContactCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
   buttonText: string;
-  buttonType?: 'filled' | 'outlined' | 'box';
+  buttonVariant?: 'primary' | 'secondary' | 'github' | 'success' | 'danger' | 'custom';
   buttonBackground?: string;
   href: string; // Make href required since we're only supporting links
   iconBackgroundColor?: string;
@@ -17,7 +16,7 @@ export default function ContactCard({
   title,
   description,
   buttonText,
-  buttonType = 'box',
+  buttonVariant = 'custom', // eslint-disable-line @typescript-eslint/no-unused-vars
   buttonBackground,
   href,
   iconBackgroundColor = '#2b61eb'
@@ -32,25 +31,17 @@ export default function ContactCard({
       </div>
       <h4 className="font-semibold text-dark mb-2 text-sm sm:text-base">{title}</h4>
       <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">{description}</p>
-      {href.startsWith('http') ? (
-        <a href={href} target="_blank" rel="noopener noreferrer">
-          <CustomButton
-            type={buttonType}
-            text={buttonText}
-            customBackground={buttonBackground}
-            altStyle={true}
-          />
-        </a>
-      ) : (
-        <Link href={href} prefetch={true}>
-          <CustomButton
-            type={buttonType}
-            text={buttonText}
-            customBackground={buttonBackground}
-            altStyle={true}
-          />
-        </Link>
-      )}
+      <ActionButton
+        variant="custom"
+        href={href}
+        customBackground={buttonBackground}
+        fullWidth={true}
+        size="md"
+        external={href.startsWith('http') || href.startsWith('mailto:')}
+        className="text-white"
+      >
+        {buttonText}
+      </ActionButton>
     </div>
   );
 }
