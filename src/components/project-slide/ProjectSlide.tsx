@@ -81,7 +81,6 @@ export default function ProjectSlide({
                                 key={index}
                                 text={typeof tag === 'string' ? tag : tag.text}
                                 mainColour={typeof tag === 'string' ? '#6366f1' : tag.color}
-                                variant="blog"
                                 size="sm"
                             />
                         ))}

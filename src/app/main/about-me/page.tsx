@@ -124,7 +124,6 @@ export default async function AboutMe() {
                                     key={skillTag.id}
                                     text={skillTag.skill}
                                     mainColour={skillTag.mainColour}
-                                    variant="default"
                                     size="md"
                                 />
                             ))}
@@ -142,7 +141,6 @@ export default async function AboutMe() {
                                         key={tech.skill}
                                         text={tech.skill}
                                         mainColour={tech.color}
-                                        variant="default"
                                         size="md"
                                     />
                                 ))

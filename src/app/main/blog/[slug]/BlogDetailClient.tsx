@@ -233,7 +233,6 @@ export default function BlogDetailClient({ slug, postData }: BlogDetailClientPro
                     key={index}
                     text={tag.text}
                     mainColour={tag.color}
-                    variant="blog"
                     size="sm"
                   />
                 ))}

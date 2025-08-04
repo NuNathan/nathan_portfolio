@@ -38,16 +38,22 @@ export default function TechnicalSkills({ skillCategories }: TechnicalSkillsProp
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {skillCategories.map((skillCategory, index) => (
-          <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto"
-              style={{
-                background: skillCategory.color
-              }}
-            >
-              {skillCategory.icon}
-            </div>
+        {skillCategories.map((skillCategory, index) => {
+          // Ensure color is a valid CSS value
+          const safeColor = skillCategory.color && typeof skillCategory.color === 'string' && skillCategory.color.trim()
+            ? skillCategory.color
+            : '#6366f1'; // Default fallback color
+
+          return (
+            <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-6 mx-auto"
+                style={{
+                  background: safeColor
+                }}
+              >
+                {skillCategory.icon}
+              </div>
 
             <h3 className="text-xl font-bold text-gray-900 text-center mb-6">{skillCategory.category}</h3>
 
@@ -57,14 +63,14 @@ export default function TechnicalSkills({ skillCategories }: TechnicalSkillsProp
                   key={skill.id}
                   text={skill.skill}
                   mainColour={skill.mainColour}
-                  variant="default"
                   size="sm"
                   darkText={true}
                 />
               ))}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
