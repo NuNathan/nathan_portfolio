@@ -1,27 +1,16 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import SkillTag from "@/components/ui/SkillTag";
 import RichTextRenderer from "@/components/ui/RichTextRenderer";
 import { PostData } from "@/api/posts";
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface BlogDetailClientProps {
+interface BlogDetailServerProps {
   slug: string;
   postData: PostData;
 }
 
-// Minimal version without any useSearchParams - hydration safe
-export default function BlogDetailClientNew({ slug, postData }: BlogDetailClientProps) {
-  const [loadingRelated, setLoadingRelated] = useState(true);
-  const [isClient, setIsClient] = useState(false);
-
-  // Ensure client-side rendering to avoid hydration mismatches
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
+// Server-side only version to avoid hydration issues
+export default function BlogDetailServer({ slug, postData }: BlogDetailServerProps) {
   // Simple breadcrumb - always go back to blog
   const breadcrumbText = 'Blog';
   const backUrl = '/main/blog';
@@ -41,34 +30,15 @@ export default function BlogDetailClientNew({ slug, postData }: BlogDetailClient
     tags: postData.tags || [],
     type: postData.type,
     date: postData.date || 'Recent',
-    views: postData.views,
-    readTime: postData.readTime,
+    views: postData.views || 0,
+    readTime: postData.readTime || '5 min read',
     links: postData.links,
     slug: postData.slug || slug,
     content: postData.content || `<p>${postData.description}</p>`,
   };
 
-  useEffect(() => {
-    // Simulate loading related items
-    setTimeout(() => {
-      setLoadingRelated(false);
-    }, 1000);
-  }, []);
-
-  // Prevent hydration mismatch by not rendering until client-side
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-[#f8f7fc] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading post...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#f8f7fc]" suppressHydrationWarning>
+    <div className="min-h-screen bg-[#f8f7fc]">
       {/* Breadcrumb Navigation */}
       <div className="max-w-4xl mx-auto px-4 pt-4 sm:pt-8 pb-4">
         <div className="flex items-center gap-2 text-sm text-gray-600 mb-6 sm:mb-8">
@@ -180,22 +150,20 @@ export default function BlogDetailClientNew({ slug, postData }: BlogDetailClient
           </div>
         </div>
 
-        {/* Related Content Section */}
+        {/* Related Content Section - Static for now */}
         <div className="mt-12 sm:mt-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">
             Related Content
           </h2>
-          
-          {loadingRelated ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading related content...</p>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-600">No related content available.</p>
-            </div>
-          )}
+          <div className="text-center py-8">
+            <p className="text-gray-600">Check out more posts on the blog page.</p>
+            <Link 
+              href="/main/blog"
+              className="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              View All Posts
+            </Link>
+          </div>
         </div>
       </div>
     </div>

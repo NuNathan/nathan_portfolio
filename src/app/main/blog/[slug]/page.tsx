@@ -1,11 +1,11 @@
-import BlogDetailClient from './BlogDetailClientNew';
+import BlogDetailServer from './BlogDetailServer';
 import { PostData } from '@/api/posts';
 import { notFound } from 'next/navigation';
 import axios from 'axios';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
 
-// Version 2.0 - Fixed useSearchParams issue
+// Version 2.1 - Fixed hydration issues
 
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 const STRAPI_URL = process.env.STRAPI_API_URL;
@@ -248,7 +248,7 @@ export default async function BlogDetailPage(props: unknown) {
       return (
         <>
           <StructuredData type={structuredData.type} data={structuredData.data} />
-          <BlogDetailClient slug={slug} postData={postData} />
+          <BlogDetailServer slug={slug} postData={postData} />
         </>
       );
     }
