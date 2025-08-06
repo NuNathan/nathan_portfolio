@@ -4,6 +4,7 @@ import { getOGImageUrl, getStrapiPostBySlug } from '@/api/strapi';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
+import { cache } from 'react';
 
 // Version 2.1 - Fixed hydration issues
 
@@ -11,31 +12,18 @@ import StructuredData from '@/components/seo/StructuredData';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// Cache for post data to avoid duplicate API calls within the same request
-// Note: This cache is per-request and will be garbage collected after the request completes
-const postDataCache = new Map<string, PostData | null>();
-
-
-
-// Helper functions
-async function getPostData(slug: string): Promise<PostData | null> {
-  // Check cache first to avoid duplicate API calls
-  if (postDataCache.has(slug)) {
-    return postDataCache.get(slug) || null;
-  }
-
+// Use React's cache to share data within the same request (prevents duplicate API calls)
+// but ensures fresh data on each new request
+const getPostData = cache(async (slug: string): Promise<PostData | null> => {
   try {
+    console.log(`Fetching fresh data for blog post: ${slug}`);
     const postData = await getStrapiPostBySlug(slug);
-    // Cache the result (including null for not found)
-    postDataCache.set(slug, postData);
     return postData;
   } catch (error) {
-    console.error('Error fetching post data for metadata:', error);
-    // Cache null result to avoid retrying
-    postDataCache.set(slug, null);
+    console.error('Error fetching post data:', error);
     return null;
   }
-}
+});
 
 function generateKeywords(post: PostData): string[] {
   if (post.seoKeywords) {
