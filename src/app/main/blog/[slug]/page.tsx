@@ -1,10 +1,10 @@
 import BlogDetailServer from './BlogDetailServer';
+import BlogDetailClient from './BlogDetailClient';
 import { PostData } from '@/api/posts';
 import { getOGImageUrl, getStrapiPostBySlug } from '@/api/strapi';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
-import { cache } from 'react';
 
 // Version 2.1 - Fixed hydration issues
 
@@ -12,18 +12,15 @@ import { cache } from 'react';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// Use React's cache to share data within the same request (prevents duplicate API calls)
-// but ensures fresh data on each new request
-const getPostData = cache(async (slug: string): Promise<PostData | null> => {
+// Helper functions
+async function getPostData(slug: string): Promise<PostData | null> {
   try {
-    console.log(`Fetching fresh data for blog post: ${slug}`);
-    const postData = await getStrapiPostBySlug(slug);
-    return postData;
+    return await getStrapiPostBySlug(slug);
   } catch (error) {
-    console.error('Error fetching post data:', error);
+    console.error('Error fetching post data for metadata:', error);
     return null;
   }
-});
+}
 
 function generateKeywords(post: PostData): string[] {
   if (post.seoKeywords) {
@@ -127,8 +124,8 @@ export default async function BlogDetailPage(props: unknown) {
   const { slug } = await (props as { params: Promise<{ slug: string }> }).params;
 
   try {
-    // Get post data using cached function to avoid duplicate API calls
-    const post = await getPostData(slug);
+    // Get post data using centralized API
+    const post = await getStrapiPostBySlug(slug);
 
     if (post) {
       // Handle author avatar - if no avatar, try to get the headshot from about-me data
@@ -157,6 +154,7 @@ export default async function BlogDetailPage(props: unknown) {
       return (
         <>
           <StructuredData type={structuredData.type} data={structuredData.data} />
+          <BlogDetailClient slug={slug} />
           <BlogDetailServer slug={slug} postData={postData} />
         </>
       );

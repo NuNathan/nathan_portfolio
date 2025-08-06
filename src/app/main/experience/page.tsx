@@ -48,17 +48,17 @@ export const metadata: Metadata = {
 const defaultPageData: {
   subHeader: string;
   experiences: Array<{
-    type: "job" | "school";
+    type: 'job' | 'school';
     startDate: string;
     endDate: string | null;
     current: boolean;
     description: string;
-    title: string | undefined;
-    company: string | undefined;
-    location: string | undefined;
-    school: string | undefined;
-    degree: string | undefined;
-    gpa: string | undefined;
+    title?: string;
+    company?: string;
+    location?: string;
+    school?: string;
+    degree?: string;
+    gpa?: string;
   }>;
   skillCategories: Array<{
     category: string;
