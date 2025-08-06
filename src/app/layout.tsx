@@ -6,12 +6,45 @@ import GlobalSpotlight from "@/components/spotlight/GlobalSpotlight";
 import ErrorBoundary from "@/components/error/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
+import { getOGImageUrl } from "@/api/strapi";
 
 
 const openSans = Open_Sans({
   subsets: ['latin'],
   display: 'swap',
 });
+
+// Helper function for structured data
+function getPersonStructuredData() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Nathan Campbell",
+    "jobTitle": "Computer Science Student",
+    "description": "Passionate Computer Science student crafting innovative digital solutions with React, Vue, and modern web technologies.",
+    "url": "https://nathan.binarybridges.ca",
+    "sameAs": [
+      "https://www.linkedin.com/in/nathan--campbell",
+      "https://github.com/NuNathan"
+    ],
+    "knowsAbout": [
+      "Software Engineering",
+      "Computer Science",
+      "Web Development",
+      "React",
+      "Vue.js",
+      "JavaScript",
+      "TypeScript",
+      "Next.js",
+      "Frontend Development",
+      "Full Stack Development"
+    ],
+    "alumniOf": {
+      "@type": "University Of Calgary",
+      "name": "Computer Science Program"
+    }
+  };
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://nathan.binarybridges.ca'),
@@ -58,7 +91,7 @@ export const metadata: Metadata = {
     description: 'Passionate Computer Science student crafting innovative digital solutions with React, Vue, and modern web technologies.',
     images: [
       {
-        url: '/og-image.jpg',
+        url: getOGImageUrl('og-image'),
         width: 1200,
         height: 630,
         alt: 'Nathan Campbell - Software Engineer Portfolio',
@@ -69,7 +102,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Nathan Campbell - Computer Science Portfolio',
     description: 'Passionate Computer Science student crafting innovative digital solutions with React, Vue, and modern web technologies.',
-    images: ['/og-image.jpg'],
+    images: [getOGImageUrl('og-image')],
     creator: '@NRCsme',
   },
   verification: {
@@ -101,36 +134,7 @@ export default function RootLayout({
         {/* Structured Data for SEO */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Person",
-              "name": "Nathan Campbell",
-              "jobTitle": "Computer Science Student",
-              "description": "Passionate Computer Science student crafting innovative digital solutions with React, Vue, and modern web technologies.",
-              "url": "https://nathan.binarybridges.ca",
-              "sameAs": [
-                "https://www.linkedin.com/in/nathan--campbell",
-                "https://github.com/NuNathan"
-              ],
-              "knowsAbout": [
-                "Software Engineering",
-                "Computer Science",
-                "Web Development",
-                "React",
-                "Vue.js",
-                "JavaScript",
-                "TypeScript",
-                "Next.js",
-                "Frontend Development",
-                "Full Stack Development"
-              ],
-              "alumniOf": {
-                "@type": "University Of Calgary",
-                "name": "Computer Science Program"
-              }
-            })
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(getPersonStructuredData()) }}
         />
       </head>
       <body className={openSans.className}>

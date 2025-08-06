@@ -15,21 +15,66 @@ export default function Error({
     console.error('Global error boundary caught:', error);
   }, [error]);
 
-  // Check if this looks like an API-related error
-  const isApiError = error.message.includes('fetch') || 
-                     error.message.includes('network') || 
-                     error.message.includes('ECONNREFUSED') ||
-                     error.message.includes('timeout') ||
-                     error.message.includes('STRAPI');
+  // Improved error categorization
+  const getErrorType = () => {
+    const message = error.message.toLowerCase();
+    const stack = error.stack?.toLowerCase() || '';
 
-  if (isApiError) {
+    // API/Network errors
+    if (message.includes('fetch') || message.includes('network') ||
+        message.includes('econnrefused') || message.includes('timeout') ||
+        message.includes('strapi') || message.includes('axios') ||
+        stack.includes('api-client')) {
+      return 'api';
+    }
+
+    // Hydration errors
+    if (message.includes('hydration') || message.includes('server') ||
+        message.includes('client') || stack.includes('hydration')) {
+      return 'hydration';
+    }
+
+    // JavaScript errors
+    if (message.includes('undefined') || message.includes('null') ||
+        message.includes('cannot read') || message.includes('is not a function')) {
+      return 'javascript';
+    }
+
+    return 'unknown';
+  };
+
+  const errorType = getErrorType();
+
+  // Handle different error types with appropriate messages
+  if (errorType === 'api') {
     return (
-      <ApiErrorPage 
+      <ApiErrorPage
         title="Connection Error"
         message="We're having trouble connecting to our services. This might be a temporary issue."
         showRetry={true}
         showHome={true}
       />
+    );
+  }
+
+  if (errorType === 'hydration') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-lg w-full bg-white shadow-lg rounded-lg p-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Loading Issue
+          </h1>
+          <p className="text-gray-600 mb-8">
+            There was a problem loading the page. Please refresh to try again.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
     );
   }
 

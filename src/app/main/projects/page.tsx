@@ -1,8 +1,8 @@
-import ProjectSlide from "@/components/project-slide/ProjectSlide";
+import ProjectsClient from './ProjectsClient';
 import ProjectImpact from "@/components/project-impact/ProjectImpact";
 import CallToAction from "@/components/call-to-action/CallToAction";
 import { PostData } from "@/api/posts";
-import { getStrapiPosts } from "@/api/strapi";
+import { getStrapiPosts, getOGImageUrl } from "@/api/strapi";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/projects-og-image.jpg",
+        url: getOGImageUrl("projects-og-image"),
         width: 1200,
         height: 630,
         alt: "Nathan Campbell - Projects Portfolio",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Projects - Nathan Campbell's Development Portfolio",
     description: "Explore Nathan Campbell's software development projects showcasing expertise in React, Vue, Next.js, and modern web technologies.",
-    images: ["/projects-og-image.jpg"],
+    images: [getOGImageUrl("projects-og-image")],
   },
   alternates: {
     canonical: "https://nathan.binarybridges.ca/main/projects",
@@ -51,20 +51,27 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export default async function Projects() {
-  // Fetch project posts using centralized API
-  let projectPosts: PostData[] = [];
-  try {
-    const response = await getStrapiPosts({
-      page: 1,
-      pageSize: 100,
-      type: 'project',
-      sortBy: 'latest'
-    });
+// Constants
+const PROJECT_FETCH_CONFIG = {
+  page: 1,
+  pageSize: 12,
+  type: 'project' as const,
+  sortBy: 'latest' as const
+};
 
-    projectPosts = response.data;
+export default async function Projects() {
+  // Fetch initial projects server-side (first page, latest first)
+  let initialProjects: PostData[] = [];
+  let totalPages = 1;
+  let totalItems = 0;
+
+  try {
+    const response = await getStrapiPosts(PROJECT_FETCH_CONFIG);
+    initialProjects = response.data;
+    totalPages = response.meta.pagination.pageCount;
+    totalItems = response.meta.pagination.total;
   } catch (error) {
-    console.error('Failed to fetch project posts:', error);
+    console.error('Failed to fetch initial project posts:', error);
   }
   return (
     <div className="max-w-7xl mx-auto px-4">
@@ -75,25 +82,12 @@ export default async function Projects() {
         </p>
       </div>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
-        {projectPosts.map((project) => (
-          <ProjectSlide
-            key={project.id}
-            title={project.title}
-            description={project.description}
-            img={project.img}
-            tags={project.tags || []}
-            type="project"
-            links={project.links || {}}
-            slug={project.slug}
-            date={project.date}
-            views={project.views}
-            readTime={project.readTime}
-            source="projects"
-          />
-        ))}
-      </div>
+      {/* Projects with Search and Pagination */}
+      <ProjectsClient
+        initialProjects={initialProjects}
+        initialTotalPages={totalPages}
+        initialTotalItems={totalItems}
+      />
 
       {/* Project Impact Section - Controlled by feature flag TODO */}
       {process.env.NEXT_PUBLIC_SHOW_PROJECT_IMPACT === 'true' && <ProjectImpact />}

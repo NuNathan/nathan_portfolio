@@ -1,5 +1,6 @@
 import Timeline from "@/components/experience/Timeline";
 import { getExperiencePage } from "@/api/experiences";
+import { getOGImageUrl } from "@/api/strapi";
 import TechnicalSkills from "@/components/technical-skills/TechnicalSkills";
 import { Metadata } from 'next';
 
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/experience-og-image.jpg",
+        url: getOGImageUrl("experience-og-image"),
         width: 1200,
         height: 630,
         alt: "Nathan Campbell - Professional Experience",
@@ -36,58 +37,57 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Experience - Nathan Campbell's Professional Journey",
     description: "Discover Nathan Campbell's professional experience, education, and technical skills in Computer Science.",
-    images: ["/experience-og-image.jpg"],
+    images: [getOGImageUrl("experience-og-image")],
   },
   alternates: {
     canonical: "https://nathan.binarybridges.ca/main/experience",
   },
 };
 
-export default async function Experience() {
-  let pageData: {
-    subHeader: string;
-    experiences: Array<{
-      type: 'job' | 'school';
-      startDate: string;
-      endDate: string | null;
-      current: boolean;
-      description: string;
-      // Job-specific fields
-      title?: string;
-      company?: string;
-      location?: string;
-      // School-specific fields
-      school?: string;
-      degree?: string;
-      gpa?: string;
+// Default data structure with proper typing
+const defaultPageData: {
+  subHeader: string;
+  experiences: Array<{
+    type: "job" | "school";
+    startDate: string;
+    endDate: string | null;
+    current: boolean;
+    description: string;
+    title: string | undefined;
+    company: string | undefined;
+    location: string | undefined;
+    school: string | undefined;
+    degree: string | undefined;
+    gpa: string | undefined;
+  }>;
+  skillCategories: Array<{
+    category: string;
+    icon: string;
+    color: string;
+    skills: Array<{
+      id: number;
+      documentId: string;
+      skill: string;
+      mainColour: string;
+      skillLevel: number;
+      createdAt: string;
+      updatedAt: string;
+      publishedAt: string;
     }>;
-    skillCategories: Array<{
-      category: string;
-      icon: string;
-      color: string;
-      skills: Array<{
-        id: number;
-        documentId: string;
-        skill: string;
-        mainColour: string;
-        skillLevel: number;
-        createdAt: string;
-        updatedAt: string;
-        publishedAt: string;
-      }>;
-    }>;
-  } = {
-    subHeader: "My professional journey through software development and education",
-    experiences: [],
-    skillCategories: []
-  };
+  }>;
+} = {
+  subHeader: "My professional journey through software development and education",
+  experiences: [],
+  skillCategories: []
+};
 
-  // We wrap only the data fetch, not the component render
+export default async function Experience() {
+  let pageData = defaultPageData;
+
   try {
     pageData = await getExperiencePage();
   } catch (error) {
     console.error("Failed to fetch experience page data:", error);
-    // Leave pageData as default object with empty arrays
   }
 
   return (
@@ -103,41 +103,7 @@ export default async function Experience() {
         {/* Timeline Section */}
         <Timeline data={{ experiences: pageData.experiences }} />
 
-        
-
-        {/* Experience Cards Section - Hidden since we're using Timeline now */}
-        {/* <div className="space-y-6">
-          {pageData.experiences.length > 0 ? (
-            pageData.experiences
-              .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()) // Sort by newest first
-              .map((experience, index) => {
-                // Color assignment logic from Timeline component
-                const allColors = [
-                  '#FF6B35', '#17A2B8', '#DC3545', '#28A745', '#6F42C1',
-                  '#20C997', '#E83E8C', '#FFC107', '#6C757D',
-                  '#6610f2', '#d63384', '#198754', '#0dcaf0', '#adb5bd'
-                ];
-                const color = allColors[index % allColors.length];
-
-                return (
-                  <Card
-                    key={`${experience.type}-${experience.title || experience.school}-${experience.startDate}`}
-                    item={experience}
-                    color={color}
-                    className="max-w-4xl mx-auto"
-                  />
-                );
-              })
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No experience data available</p>
-            </div>
-          )}
-        </div> */}
-
-
-
-        {/* Technical Skills Section - only render if we have skill categories */}
+        {/* Technical Skills Section */}
         {pageData.skillCategories && pageData.skillCategories.length > 0 && (
           <TechnicalSkills skillCategories={pageData.skillCategories} />
         )}

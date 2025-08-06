@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import StructuredData from './StructuredData';
+import { getOGImageUrl } from '@/api/strapi';
 
 interface SEOHeadProps {
   title: string;
@@ -19,7 +20,7 @@ export default function SEOHead({
   title,
   description,
   canonical,
-  ogImage = '/og-image.jpg',
+  ogImage = getOGImageUrl('og-image'),
   ogType = 'website',
   keywords = [],
   structuredData,

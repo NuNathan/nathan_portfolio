@@ -4,15 +4,18 @@ import { checkStrapiHealth } from "@/api/strapi";
 import ErrorBoundary from "@/components/error/ErrorBoundary";
 import ApiErrorPage from "@/components/error/ApiErrorPage";
 
+// Helper function to check if data is fallback
+function isFallbackData(data: any): boolean {
+  return data?.documentId === "fallback";
+}
+
 export default async function Home() {
   try {
     const homePageData = await getHomePage();
 
     // Check if we got fallback data (indicates API issues)
-    const isUsingFallbackData = homePageData.data.documentId === "fallback";
-
-    if (isUsingFallbackData) {
-      // Double-check API health
+    if (isFallbackData(homePageData.data)) {
+      // Double-check API health before showing error
       const apiHealthy = await checkStrapiHealth();
 
       if (!apiHealthy) {

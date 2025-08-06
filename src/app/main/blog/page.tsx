@@ -1,6 +1,6 @@
 import BlogClient from './BlogClient';
 import { PostData } from "@/api/posts";
-import { getStrapiPosts } from "@/api/strapi";
+import { getOGImageUrl, getStrapiPosts } from "@/api/strapi";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/blog-og-image.jpg",
+        url: getOGImageUrl("blog-og-image"),
         width: 1200,
         height: 630,
         alt: "Nathan Campbell - Technical Blog",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Blog - Nathan Campbell's Technical Insights",
     description: "Read Nathan Campbell's blog featuring technical articles, tutorials, and insights on Computer Science and web development.",
-    images: ["/blog-og-image.jpg"],
+    images: [getOGImageUrl("blog-og-image")],
   },
   alternates: {
     canonical: "https://nathan.binarybridges.ca/main/blog",
@@ -58,7 +58,7 @@ export default async function Blog() {
   try {
     const response = await getStrapiPosts({
       page: 1,
-      pageSize: 6,
+      pageSize: 12,
       sortBy: 'latest'
     });
 

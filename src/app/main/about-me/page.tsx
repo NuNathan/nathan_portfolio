@@ -1,14 +1,9 @@
 import { getAboutMe } from "@/api/aboutMe";
+import { getOGImageUrl } from "@/api/strapi";
 import ContactCard from "@/components/ui/ContactCard";
 import SkillTag from "@/components/ui/SkillTag";
 import Image from 'next/image';
 import { Metadata } from 'next';
-
-interface SkillTag {
-    id: number;
-    skill: string;
-    mainColour: string;
-}
 
 export const metadata: Metadata = {
   title: "About Nathan Campbell - Computer Science Student",
@@ -31,7 +26,7 @@ export const metadata: Metadata = {
     type: "profile",
     images: [
       {
-        url: "/about-og-image.jpg",
+        url: getOGImageUrl("about-og-image"),
         width: 1200,
         height: 630,
         alt: "Nathan Campbell - About Page",
@@ -42,12 +37,35 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "About Nathan Campbell - Computer Science Student",
     description: "Learn about Nathan Campbell, a passionate Computer Science student with expertise in React, Vue, and modern web technologies.",
-    images: ["/about-og-image.jpg"],
+    images: [getOGImageUrl("about-og-image")],
   },
   alternates: {
     canonical: "https://nathan.binarybridges.ca/main/about-me",
   },
 };
+
+// Helper function to render skill tags with fallback
+function renderSkillTags(skillTags?: any[]) {
+    const fallbackSkills = [
+        { skill: 'React', color: '#61dafb' },
+        { skill: 'Node.js', color: '#68a063' },
+        { skill: 'TypeScript', color: '#3178c6' },
+        { skill: 'Python', color: '#3776ab' },
+        { skill: 'Vue.js', color: '#4fc08d' },
+        { skill: 'UI/UX', color: '#ff6b6b' }
+    ];
+
+    const skills = skillTags?.length ? skillTags : fallbackSkills;
+
+    return skills.map((skill: any) => (
+        <SkillTag
+            key={skill.id || skill.skill}
+            text={skill.skill}
+            mainColour={skill.mainColour || skill.color}
+            size="md"
+        />
+    ));
+}
 
 export default async function AboutMe() {
     let aboutMeData = null;
@@ -119,32 +137,7 @@ export default async function AboutMe() {
                     {/* Tech Stack */}
                     <div className="mb-8">
                         <div className="flex flex-wrap gap-3">
-                            {(aboutMeData?.skillTags || []).map((skillTag: SkillTag) => (
-                                <SkillTag
-                                    key={skillTag.id}
-                                    text={skillTag.skill}
-                                    mainColour={skillTag.mainColour}
-                                    size="md"
-                                />
-                            ))}
-                            {/* Fallback skills if no data */}
-                            {(!aboutMeData?.skillTags || aboutMeData.skillTags.length === 0) &&
-                                [
-                                    { skill: 'React', color: '#61dafb' },
-                                    { skill: 'Node.js', color: '#68a063' },
-                                    { skill: 'TypeScript', color: '#3178c6' },
-                                    { skill: 'Python', color: '#3776ab' },
-                                    { skill: 'Vue.js', color: '#4fc08d' },
-                                    { skill: 'UI/UX', color: '#ff6b6b' }
-                                ].map((tech) => (
-                                    <SkillTag
-                                        key={tech.skill}
-                                        text={tech.skill}
-                                        mainColour={tech.color}
-                                        size="md"
-                                    />
-                                ))
-                            }
+                            {renderSkillTags(aboutMeData?.skillTags)}
                         </div>
                     </div>
                 </div>

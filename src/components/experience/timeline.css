@@ -1,0 +1,9 @@
+.mobile-offset {
+  left: 32px;
+}
+
+@media (min-width: 768px) {
+  .mobile-offset {
+    left: 204px;
+  }
+}

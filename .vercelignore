@@ -8,6 +8,7 @@ src/app/test-*
 .env.development.local
 .env.test.local
 .env.production.local
+.env
 
 # Ignore documentation that doesn't need to be deployed
 SEO_IMPLEMENTATION_SUMMARY.md

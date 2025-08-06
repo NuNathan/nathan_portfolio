@@ -31,6 +31,7 @@ export interface PostData {
   createdAt: string;
   updatedAt: string;
   content?: string; // Rich text content from CKEditor
+  seoKeywords?: string; // Comma-separated SEO keywords from Strapi
 }
 
 export interface PostsResponse {

@@ -26,17 +26,15 @@ export default function ActionButton({
   external = false,
 }: ActionButtonProps) {
   
-  // Base styles with enhanced hover effects
-  const baseStyles = `
-    inline-flex items-center justify-center gap-2
-    font-medium rounded-lg
-    transition-all duration-300 ease-out
-    transform-gpu
-    cursor-pointer
-    relative overflow-hidden
-    ${fullWidth ? 'w-full' : ''}
-    ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-xl active:scale-95'}
-  `;
+  // Base styles - simplified for better readability
+  const baseStyles = [
+    'inline-flex items-center justify-center gap-2',
+    'font-medium rounded-lg',
+    'transition-all duration-300 ease-out',
+    'cursor-pointer relative overflow-hidden',
+    fullWidth && 'w-full',
+    disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 hover:shadow-xl active:scale-95'
+  ].filter(Boolean).join(' ');
 
   // Size variants - matching original CustomButton sizes
   const sizeStyles = {

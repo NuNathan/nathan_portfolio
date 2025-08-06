@@ -10,6 +10,20 @@ export function transformImageUrl(url: string | undefined): string {
   return url.startsWith('http') ? url : `${STRAPI_MEDIA_URL}${url}`;
 }
 
+// Get OG image from Strapi
+export function getOGImageUrl(imageName: string): string {
+  const imageMap: Record<string, string> = {
+    'og-image': '/og_image_997a648fa9.jpg',
+    'projects-og-image': '/uploads/projects_og_image_e5d2da9ee7.jpg',
+    'about-og-image': '/about_og_image_ff561a3243.jpg',
+    'experience-og-image': '/experience_og_image_37a1b7d41d.jpg',
+    'blog-og-image': '/blog_og_image_b1137d1c40.jpg',
+  };
+
+  const imagePath = imageMap[imageName] || imageMap['og-image'];
+  return transformImageUrl(imagePath);
+}
+
 // Transform post data from Strapi response
 export function transformPostData(post: any): PostData {
   // Handle img object with url property or direct string
@@ -49,7 +63,8 @@ export function transformPostData(post: any): PostData {
     publishedAt: post.publishedAt,
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
-    content: post.content
+    content: post.content,
+    seoKeywords: post.seoKeywords || undefined
   };
 }
 
@@ -105,7 +120,7 @@ export async function getStrapiPosts(params: {
   }
 
   const response = await strapiGet(`/posts?${queryParams.toString()}`);
-  
+
   // Transform the response data
   const transformedData = response.data.data?.map(transformPostData) || [];
 
@@ -122,11 +137,11 @@ export async function getStrapiPostBySlug(slug: string) {
   queryParams.append('filters[slug][$eq]', slug);
 
   const response = await strapiGet(`/posts?${queryParams.toString()}`);
-  
+
   if (response.data.data && response.data.data.length > 0) {
     return transformPostData(response.data.data[0]);
   }
-  
+
   return null;
 }
 

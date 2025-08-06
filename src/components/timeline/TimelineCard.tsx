@@ -1,4 +1,5 @@
 import { formatTimelineDate } from '@/utils/dateUtils';
+import { getLocationBadgeColor, getSlotAndColorAssignments, createTimelineItemId } from '@/utils/timelineColors';
 
 interface TimelineCardProps {
   timelineMonth: {
@@ -98,19 +99,7 @@ const itemsWithCardsThisMonth = activeItems.filter(item => {
 });
 
 
-  // Determine the badge color based on work location
-  const getLocationBadgeColor = (location: string) => {
-    switch (location) {
-      case 'Remote':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'Hybrid':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'On-site':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+
 
   // Calculate height and vertical position of the timeline bar for an active item
   const calculateBarDimensions = (item: any) => {
@@ -219,68 +208,8 @@ const itemsWithCardsThisMonth = activeItems.filter(item => {
 
 
 
-  const getSlotAndColorAssignments = (items: typeof allItems) => {
-  const now = new Date();
-  const allColors = [
-    '#FF6B35', '#17A2B8', '#DC3545', '#28A745', '#6F42C1',
-    '#20C997', '#E83E8C', '#FFC107', '#6C757D',
-    '#6610f2', '#d63384', '#198754', '#0dcaf0', '#adb5bd'
-  ];
-
-  const activeColors: { end: Date; color: string }[] = [];
-  const activeSlots: { end: Date; slot: number }[] = [];
-  const assignments: Record<string, { slot: number; color: string }> = {};
-
-  const sorted = [...items].sort((a, b) =>
-    new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-  );
-
-  for (const item of sorted) {
-    const id = `${item.type}-${item.title || item.school || 'unknown'}-${item.startDate}`;
-    // Parse dates properly - handle YYYY-MM format
-    const parseDate = (dateStr: string) => {
-      if (dateStr.match(/^\d{4}-\d{2}$/)) {
-        const [year, month] = dateStr.split('-');
-        return new Date(parseInt(year), parseInt(month) - 1, 1);
-      }
-      return new Date(dateStr);
-    };
-
-    const start = parseDate(item.startDate);
-    const end = item.endDate ? parseDate(item.endDate) : now;
-
-    // Clear expired slots
-    for (let i = activeSlots.length - 1; i >= 0; i--) {
-      if (activeSlots[i].end < start) activeSlots.splice(i, 1);
-    }
-
-    const usedSlots = new Set(activeSlots.map(s => s.slot));
-    let slot = 0;
-    while (usedSlots.has(slot)) slot++;
-    activeSlots.push({ end, slot });
-
-    // Clear expired colors
-    const BUFFER_DAYS = 32;
-
-    for (let i = activeColors.length - 1; i >= 0; i--) {
-      const releaseDate = new Date(activeColors[i].end);
-      releaseDate.setDate(releaseDate.getDate() + BUFFER_DAYS);
-      if (releaseDate < start) {
-        activeColors.splice(i, 1); // Color is safely reusable
-      }
-    }
-
-    const usedColors = new Set(activeColors.map(c => c.color));
-    const color = allColors.find(c => !usedColors.has(c)) || '#000000';
-    activeColors.push({ end, color });
-
-    assignments[id] = { slot, color };
-  }
-
-  return assignments;
-};
-
-const slotMap = getSlotAndColorAssignments(allItems);
+  // Get color and slot assignments for all items
+  const slotMap = getSlotAndColorAssignments(allItems);
 
   return (
     <>
@@ -289,7 +218,7 @@ const slotMap = getSlotAndColorAssignments(allItems);
         const barDimensions = calculateBarDimensions(item);
         if (barDimensions.height <= 0) return null;
 
-        const id = `${item.type}-${item.title || item.school || 'unknown'}-${item.startDate}`;
+        const id = createTimelineItemId(item);
         const assignment = slotMap[id];
 
         if (!assignment) {
@@ -335,7 +264,7 @@ const slotMap = getSlotAndColorAssignments(allItems);
 
       {/* Render cards and connection lines for items that start this month */}
       {itemsWithCardsThisMonth.map((item) => {
-        const id = `${item.type}-${item.title || item.school || 'unknown'}-${item.startDate}`;
+        const id = createTimelineItemId(item);
         const assignment = slotMap[id];
 
         // Get pre-calculated card position

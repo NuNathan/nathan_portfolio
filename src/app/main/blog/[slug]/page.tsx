@@ -1,6 +1,6 @@
 import BlogDetailServer from './BlogDetailServer';
 import { PostData } from '@/api/posts';
-import { getStrapiPostBySlug } from '@/api/strapi';
+import { getOGImageUrl, getStrapiPostBySlug } from '@/api/strapi';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
@@ -11,14 +11,51 @@ import StructuredData from '@/components/seo/StructuredData';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// Function to fetch post data for metadata
+// Cache for post data to avoid duplicate API calls within the same request
+// Note: This cache is per-request and will be garbage collected after the request completes
+const postDataCache = new Map<string, PostData | null>();
+
+
+
+// Helper functions
 async function getPostData(slug: string): Promise<PostData | null> {
+  // Check cache first to avoid duplicate API calls
+  if (postDataCache.has(slug)) {
+    return postDataCache.get(slug) || null;
+  }
+
   try {
-    return await getStrapiPostBySlug(slug);
+    const postData = await getStrapiPostBySlug(slug);
+    // Cache the result (including null for not found)
+    postDataCache.set(slug, postData);
+    return postData;
   } catch (error) {
     console.error('Error fetching post data for metadata:', error);
+    // Cache null result to avoid retrying
+    postDataCache.set(slug, null);
     return null;
   }
+}
+
+function generateKeywords(post: PostData): string[] {
+  if (post.seoKeywords) {
+    return [
+      'Nathan Campbell',
+      ...post.seoKeywords.split(',').map(k => k.trim()).filter(k => k.length > 0),
+      'Technical Article',
+      'Blog Post'
+    ];
+  }
+
+  return [
+    'Nathan Campbell',
+    post.title,
+    ...(post.tags?.map((tag: any) => tag.text || tag.skill) || []),
+    'Technical Article',
+    'Blog Post',
+    'Software Engineering',
+    'Web Development'
+  ];
 }
 
 // Generate metadata for individual blog posts
@@ -38,16 +75,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   const postDate = post.completionDate ? new Date(post.completionDate).toISOString() : new Date().toISOString();
   const postUrl = `https://nathan.binarybridges.ca/main/blog/${slug}`;
 
-  // Generate keywords from tags
-  const keywords = [
-    'Nathan Campbell',
-    post.title,
-    ...(post.tags?.map((tag: any) => tag.text || tag.skill) || []),
-    'Technical Article',
-    'Blog Post',
-    'Software Engineering',
-    'Web Development'
-  ];
+  const keywords = generateKeywords(post);
 
   return {
     title: `${post.title} | Nathan Campbell`,
@@ -68,7 +96,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
       tags: post.tags?.map((tag: any) => tag.text || tag.skill) || [],
       images: [
         {
-          url: post.img || '/blog-og-image.jpg',
+          url: post.img || getOGImageUrl('og-image'),
           width: 1200,
           height: 630,
           alt: post.title,
@@ -79,7 +107,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
       card: 'summary_large_image',
       title: post.title,
       description: cleanDescription,
-      images: [post.img || '/blog-og-image.jpg'],
+      images: [post.img || getOGImageUrl('og-image')],
       creator: '@NRCsme',
     },
     alternates: {
@@ -111,8 +139,8 @@ export default async function BlogDetailPage(props: unknown) {
   const { slug } = await (props as { params: Promise<{ slug: string }> }).params;
 
   try {
-    // Get post data using centralized API
-    const post = await getStrapiPostBySlug(slug);
+    // Get post data using cached function to avoid duplicate API calls
+    const post = await getPostData(slug);
 
     if (post) {
       // Handle author avatar - if no avatar, try to get the headshot from about-me data

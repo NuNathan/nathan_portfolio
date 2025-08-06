@@ -28,7 +28,7 @@ export default function BlogClient({
   const [totalItems, setTotalItems] = useState(initialTotalItems);
   const [hasSearched, setHasSearched] = useState(false); // Track if user has searched/filtered
 
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
 
   // Debounce search term to reduce API calls
   useEffect(() => {
@@ -48,17 +48,21 @@ export default function BlogClient({
     }
   }, [searchTerm, debouncedSearchTerm]);
 
-  // Fetch posts when parameters change (only when debounced search term changes)
+  // Check if we should use initial data (no filters applied)
+  const shouldUseInitialData = !hasSearched &&
+    debouncedSearchTerm === '' &&
+    selectedType === 'all' &&
+    sortBy === 'latest' &&
+    currentPage === 1;
+
+  // Fetch posts when parameters change
   useEffect(() => {
-    // If no search/filter changes, use initial data
-    if (!hasSearched && debouncedSearchTerm === '' && selectedType === 'all' && sortBy === 'latest' && currentPage === 1) {
-      return;
-    }
+    if (shouldUseInitialData) return;
 
     const fetchPosts = async () => {
       try {
         setHasSearched(true);
-        
+
         const params: PostsQueryParams = {
           page: currentPage,
           pageSize: itemsPerPage,
@@ -80,7 +84,7 @@ export default function BlogClient({
     };
 
     fetchPosts();
-  }, [currentPage, debouncedSearchTerm, selectedType, sortBy, hasSearched]);
+  }, [currentPage, debouncedSearchTerm, selectedType, sortBy, hasSearched, shouldUseInitialData]);
 
   // Reset to page 1 when search or filters change
   useEffect(() => {

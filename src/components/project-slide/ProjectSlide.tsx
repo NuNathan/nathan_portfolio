@@ -91,12 +91,13 @@ export default function ProjectSlide({
 
                 {/* Launch Demo button - moved above date/view/time section */}
                 {type === 'project' && links.demo && links.demo !== '' && links.demo !== '#' && (
-                    <div className="mb-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="mb-4" onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(links.demo, '_blank', 'noopener,noreferrer');
+                    }}>
                         <ActionButton
                             variant="primary"
                             size="md"
-                            href={links.demo}
-                            external={true}
                         >
                             Launch Demo
                         </ActionButton>

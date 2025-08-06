@@ -10,37 +10,29 @@ export default function MainLayout({
 }) {
     const pathname = usePathname()
 
-    let heading;
-    let colour;
+    // Route configuration - easier to maintain
+    const routes = {
+        "/main/projects": "Projects",
+        "/main/about-me": "About Me",
+        "/main/experience": "Work Experience",
+        "/main/blog": "Blog & Insights"
+    } as const;
 
-    switch (pathname) {
-        case "/main/projects":
-            heading = "Projects"
-            colour = "#f8f7fc"
-            break
-        case "/main/about-me":
-            heading = "About Me"
-            colour = "#f8f7fc"
-            break
-        case "/main/experience":
-            heading = "Work Experience"
-            colour = "#f8f7fc"
-            break
-        case "/main/blog":
-            heading = "Blog & Insights"
-            colour = "#f8f7fc"
-            break
-        default:
-            // Handle blog detail pages - they don't need the large heading
-            if (pathname.startsWith("/main/blog/")) {
-                heading = ""
-                colour = "#f8f7fc"
-            } else {
-                heading = "Err"
-                colour = "#f8f7fc"
-            }
-            break
-    }
+    const colour = "#f8f7fc";
+
+    // Get heading based on current route
+    const getHeading = () => {
+        if (routes[pathname as keyof typeof routes]) {
+            return routes[pathname as keyof typeof routes];
+        }
+        // Blog detail pages don't need the large heading
+        if (pathname.startsWith("/main/blog/")) {
+            return "";
+        }
+        return "Err";
+    };
+
+    const heading = getHeading();
 
     return (
         <div className="relative min-h-screen pt-16" style={{ backgroundColor: colour }}>
