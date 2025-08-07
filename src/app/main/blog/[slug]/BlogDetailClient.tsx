@@ -47,6 +47,7 @@ export default function BlogDetailClient({ slug }: BlogDetailClientProps) {
         }
       } catch (error) {
         // Silently handle errors
+        console.error('Error incrementing view count:', error);
       } finally {
         // Always remove from the incrementing set when done
         incrementingPosts.delete(slug);
