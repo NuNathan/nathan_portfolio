@@ -20,10 +20,13 @@ declare global {
 
 // Vercel Analytics tracking function
 export function trackVercelEvent(eventName: string, properties?: Record<string, any>) {
-  if (typeof window !== 'undefined' && window.va) {
-    try {
+  try {
+    if (typeof window !== 'undefined' && window.va && typeof window.va.track === 'function') {
       window.va.track(eventName, properties);
-    } catch (error) {
+    }
+  } catch (error) {
+    // Silently fail for analytics to prevent breaking the app
+    if (process.env.NODE_ENV === 'development') {
       console.warn('Vercel Analytics tracking failed:', error);
     }
   }
@@ -31,10 +34,13 @@ export function trackVercelEvent(eventName: string, properties?: Record<string, 
 
 // Rybbit tracking function
 export function trackRybbitEvent(eventName: string, properties?: Record<string, any>) {
-  if (typeof window !== 'undefined' && window.rybbit) {
-    try {
+  try {
+    if (typeof window !== 'undefined' && window.rybbit && typeof window.rybbit.event === 'function') {
       window.rybbit.event(eventName, properties);
-    } catch (error) {
+    }
+  } catch (error) {
+    // Silently fail for analytics to prevent breaking the app
+    if (process.env.NODE_ENV === 'development') {
       console.warn('Rybbit tracking failed:', error);
     }
   }

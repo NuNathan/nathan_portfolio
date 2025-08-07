@@ -4,6 +4,8 @@ import "./globals.css";
 import TopNavigation from "@/components/navigation/TopNavigation";
 import GlobalSpotlight from "@/components/spotlight/GlobalSpotlight";
 import ErrorBoundary from "@/components/error/ErrorBoundary";
+import AnalyticsErrorBoundary from "@/components/error/AnalyticsErrorBoundary";
+import GlobalErrorHandler from "@/components/error/GlobalErrorHandler";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import { getOGImageUrl } from "@/api/strapi";
@@ -139,18 +141,25 @@ export default function RootLayout({
       </head>
       <body className={openSans.className}>
         {/** Rybbit and Vercel analytics */}
-        <script
-          src="https://app.rybbit.io/api/script.js"
-          data-site-id="1975"
-          defer
-        ></script>
-        <Analytics />
-        <SpeedInsights />
+        <AnalyticsErrorBoundary>
+          <script
+            src="https://app.rybbit.io/api/script.js"
+            data-site-id="1975"
+            defer
+          ></script>
+          <Analytics />
+          <SpeedInsights />
+        </AnalyticsErrorBoundary>
 
+
+        {/** Global error handler */}
+        <GlobalErrorHandler />
 
         {/** Main app content */}
         <ErrorBoundary>
-          <GlobalSpotlight />
+          <AnalyticsErrorBoundary>
+            <GlobalSpotlight />
+          </AnalyticsErrorBoundary>
           <TopNavigation />
           <main className="">
             {children}

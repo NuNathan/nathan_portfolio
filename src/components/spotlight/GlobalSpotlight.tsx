@@ -12,6 +12,9 @@ export default function GlobalSpotlight() {
 
   // Check if we're on desktop (768px and above)
   useEffect(() => {
+    // Ensure we're in the browser before accessing window
+    if (typeof window === 'undefined') return;
+
     const checkIsDesktop = () => {
       setIsDesktop(window.innerWidth >= 768);
     };
@@ -23,7 +26,7 @@ export default function GlobalSpotlight() {
 
   // Mouse tracking effect
   useEffect(() => {
-    if (!isDesktop) return;
+    if (!isDesktop || typeof window === 'undefined') return;
 
     const handleMouseMove = (e: MouseEvent) => {
       const x = e.clientX;
@@ -44,6 +47,8 @@ export default function GlobalSpotlight() {
 
   // Listen for title hover events from home page
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const handleTitleHover = (event: CustomEvent) => {
       setHoveringTitle(event.detail.hovering);
     };

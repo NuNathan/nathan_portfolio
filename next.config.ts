@@ -28,8 +28,6 @@ const nextConfig: NextConfig = {
   },
   // Enable compression
   compress: true,
-  // Optimize builds
-  swcMinify: true,
   // Security and SEO headers
   async headers() {
     return [

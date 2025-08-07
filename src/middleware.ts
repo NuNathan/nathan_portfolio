@@ -85,16 +85,18 @@ export function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
   
-  // Content Security Policy
+  // Content Security Policy - More permissive for search engines
   response.headers.set(
     'Content-Security-Policy',
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.rybbit.io https://va.vercel-scripts.com; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://app.rybbit.io https://va.vercel-scripts.com https://vercel.live; " +
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com; " +
     "img-src 'self' data: https: blob:; " +
-    "connect-src 'self' https://app.rybbit.io https://vitals.vercel-insights.com; " +
-    "frame-ancestors 'none';"
+    "connect-src 'self' https://app.rybbit.io https://vitals.vercel-insights.com https://vercel.live; " +
+    "frame-ancestors 'none'; " +
+    "object-src 'none'; " +
+    "base-uri 'self';"
   )
   
   // Add cache control for static assets

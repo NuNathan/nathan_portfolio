@@ -55,6 +55,9 @@ export default function HomeClient({ homePageData }: HomeClientProps) {
 
   // onMount
   useEffect(() => {
+    // Ensure we're in the browser before accessing window
+    if (typeof window === 'undefined') return;
+
     // Set initial screen width
     setScreenWidth(window.innerWidth);
 
