@@ -47,20 +47,27 @@ const allowedBots = [
 
 export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || ''
-  
+
+  // Skip bot detection for API routes - they should be handled separately
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const response = NextResponse.next()
+    return response
+  }
+
   // Check if the user agent contains any blocked patterns
-  const isBlockedBot = blockedUserAgents.some(bot => 
+  const isBlockedBot = blockedUserAgents.some(bot =>
     userAgent.toLowerCase().includes(bot.toLowerCase())
   )
-  
+
   // Check if it's an allowed search engine bot
-  const isAllowedBot = allowedBots.some(bot => 
+  const isAllowedBot = allowedBots.some(bot =>
     userAgent.toLowerCase().includes(bot.toLowerCase())
   )
-  
+
   // Block AI crawlers and scrapers but allow search engines
   if (isBlockedBot && !isAllowedBot) {
-    return new NextResponse('Access Denied - Bot Protection Active', { 
+    console.log('Blocked bot detected:', userAgent)
+    return new NextResponse('Access Denied - Bot Protection Active', {
       status: 403,
       headers: {
         'Content-Type': 'text/plain',
@@ -107,6 +114,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api/|_next/static|_next/image|favicon.ico).*)',
   ],
 }
