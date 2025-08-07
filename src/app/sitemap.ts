@@ -32,14 +32,22 @@ async function getAllBlogPosts(): Promise<BlogPost[]> {
       headers: {
         Authorization: `Bearer ${STRAPI_TOKEN}`,
       },
-      timeout: 10000,
+      timeout: 5000, // Reduced timeout for faster failure
     });
+
+    if (response.status !== 200) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
 
     const posts = response.data?.data || [];
     console.log(`Sitemap: Successfully fetched ${posts.length} blog posts`);
     return posts;
   } catch (error) {
-    console.error('Error fetching blog posts for sitemap:', error);
+    if (axios.isAxiosError(error)) {
+      console.warn(`Sitemap: API error - ${error.code || error.response?.status}: ${error.message}`);
+    } else {
+      console.warn('Sitemap: Unexpected error fetching blog posts:', error);
+    }
     return [];
   }
 }
@@ -47,7 +55,7 @@ async function getAllBlogPosts(): Promise<BlogPost[]> {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const currentDate = new Date().toISOString();
 
-  // Static pages configuration
+  // Static pages configuration - these always work
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: BASE_URL,
@@ -81,20 +89,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Dynamic blog posts
-  const blogPosts = await getAllBlogPosts();
-  const blogPostPages: MetadataRoute.Sitemap = blogPosts
-    .filter((post): post is BlogPost & { slug: string } =>
-      Boolean(post.slug && typeof post.slug === 'string')
-    )
-    .map((post) => ({
-      url: `${BASE_URL}/main/blog/${post.slug}`,
-      lastModified: post.updatedAt || post.publishedAt || currentDate,
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
+  try {
+    // Try to get dynamic blog posts, but don't fail if it doesn't work
+    const blogPosts = await getAllBlogPosts();
+    const blogPostPages: MetadataRoute.Sitemap = blogPosts
+      .filter((post): post is BlogPost & { slug: string } =>
+        Boolean(post.slug && typeof post.slug === 'string')
+      )
+      .map((post) => ({
+        url: `${BASE_URL}/main/blog/${post.slug}`,
+        lastModified: post.updatedAt || post.publishedAt || currentDate,
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+      }));
 
-  console.log(`Sitemap: Generated ${staticPages.length} static pages and ${blogPostPages.length} blog post pages`);
-
-  return [...staticPages, ...blogPostPages];
+    console.log(`Sitemap: Generated ${staticPages.length} static pages and ${blogPostPages.length} blog post pages`);
+    return [...staticPages, ...blogPostPages];
+  } catch (error) {
+    console.warn('Sitemap: Failed to fetch dynamic content, returning static pages only:', error);
+    return staticPages;
+  }
 }
