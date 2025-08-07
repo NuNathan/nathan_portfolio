@@ -13,15 +13,14 @@ export function transformImageUrl(url: string | undefined): string {
 // Get OG image from Strapi
 export function getOGImageUrl(imageName: string): string {
   const imageMap: Record<string, string> = {
-    'og-image': '/og_image_997a648fa9.jpg',
-    'projects-og-image': '/uploads/projects_og_image_e5d2da9ee7.jpg',
-    'about-og-image': '/about_og_image_ff561a3243.jpg',
-    'experience-og-image': '/experience_og_image_37a1b7d41d.jpg',
-    'blog-og-image': '/blog_og_image_b1137d1c40.jpg',
+    'og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/og_image_997a648fa9.jpg',
+    'projects-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/projects_og_image_e5d2da9ee7.jpg',
+    'about-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/about_og_image_ff561a3243.jpg',
+    'experience-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/experience_og_image_37a1b7d41d.jpg',
+    'blog-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/blog_og_image_b1137d1c40.jpg',
   };
 
-  const imagePath = imageMap[imageName] || imageMap['og-image'];
-  return transformImageUrl(imagePath);
+  return imageMap[imageName] || imageMap['og-image'];
 }
 
 // Transform post data from Strapi response
