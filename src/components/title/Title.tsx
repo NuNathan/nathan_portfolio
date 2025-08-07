@@ -1,6 +1,7 @@
 'use client';
 import "./title.css";
 import CustomButton from "../ui/CustomButton";
+import TrackedCustomButton from "../ui/TrackedCustomButton";
 import Link from 'next/link';
 
 interface TitleProps {
@@ -58,9 +59,11 @@ const DivWrapper = ({mouseEnter, mouseLeave, hidden, header, subHeader, resumeUr
           />
         </Link>
         <a href={resumeUrl || "#"} target="_blank" rel="noreferrer">
-          <CustomButton
+          <TrackedCustomButton
             type="outlined"
             text="Download Resume"
+            trackingType="resume"
+            location="homepage"
           />
         </a>
       </div>

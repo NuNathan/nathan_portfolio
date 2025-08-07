@@ -119,13 +119,20 @@ export default function ActionButton({
           rel={external || href.startsWith('http') ? 'noopener noreferrer' : undefined}
           className={buttonClasses}
           style={buttonStyle}
+          onClick={onClick}
         >
           {content}
         </a>
       );
     } else {
       return (
-        <Link href={href} className={buttonClasses} style={buttonStyle} prefetch={true}>
+        <Link
+          href={href}
+          className={buttonClasses}
+          style={buttonStyle}
+          prefetch={true}
+          onClick={onClick}
+        >
           {content}
         </Link>
       );

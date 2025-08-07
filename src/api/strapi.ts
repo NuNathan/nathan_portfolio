@@ -2,6 +2,75 @@ import { strapiGet } from '@/utils/api-client';
 import { PostData, PostTag } from './posts';
 import { formatDateConsistently } from '@/utils/dateUtils';
 
+// Tracking functions for user interactions
+declare global {
+  interface Window {
+    va?: {
+      track: (event: string, properties?: Record<string, any>) => void;
+    };
+    rybbit?: {
+      event: (name: string, properties?: Record<string, any>) => void;
+      pageview: () => void;
+      identify: (userId: string) => void;
+      clearUserId: () => void;
+      getUserId: () => string | null;
+    };
+  }
+}
+
+// Vercel Analytics tracking function
+export function trackVercelEvent(eventName: string, properties?: Record<string, any>) {
+  if (typeof window !== 'undefined' && window.va) {
+    try {
+      window.va.track(eventName, properties);
+    } catch (error) {
+      console.warn('Vercel Analytics tracking failed:', error);
+    }
+  }
+}
+
+// Rybbit tracking function
+export function trackRybbitEvent(eventName: string, properties?: Record<string, any>) {
+  if (typeof window !== 'undefined' && window.rybbit) {
+    try {
+      window.rybbit.event(eventName, properties);
+    } catch (error) {
+      console.warn('Rybbit tracking failed:', error);
+    }
+  }
+}
+
+// Combined tracking function that sends to both platforms
+export function trackUserInteraction(eventName: string, properties?: Record<string, any>) {
+  trackVercelEvent(eventName, properties);
+  trackRybbitEvent(eventName, properties);
+}
+
+// Specific tracking functions for resume downloads
+export function trackResumeDownload(location: 'homepage' | 'about-page') {
+  const eventName = 'resume_download';
+  const properties = {
+    location,
+    timestamp: new Date().toISOString(),
+    page: location === 'homepage' ? '/' : '/main/about-me'
+  };
+
+  trackUserInteraction(eventName, properties);
+}
+
+// Specific tracking functions for social link clicks
+export function trackSocialLinkClick(platform: 'email' | 'linkedin' | 'github', location: 'about-page') {
+  const eventName = 'social_link_click';
+  const properties = {
+    platform,
+    location,
+    timestamp: new Date().toISOString(),
+    page: '/main/about-me'
+  };
+
+  trackUserInteraction(eventName, properties);
+}
+
 const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 
 // Transform image URLs to use STRAPI_MEDIA_URL
