@@ -110,10 +110,12 @@ export const config = {
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)
-     * - _next/static (static files)
+     * - _next/static (static files - allow search engines)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - robots.txt (robots file)
+     * - sitemap.xml (sitemap file)
      */
-    '/((?!api/|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api/|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
   ],
 }

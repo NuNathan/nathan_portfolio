@@ -6,14 +6,14 @@ export default function robots(): MetadataRoute.Robots {
       // Allow major search engines
       {
         userAgent: ['Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider', 'YandexBot'],
-        allow: '/',
-        disallow: ['/api/', '/test-*', '/_next/', '/admin/'],
+        allow: ['/', '/_next/static/'],
+        disallow: ['/api/', '/test-*', '/_next/image/', '/admin/'],
       },
       // Allow social media crawlers
       {
         userAgent: ['facebookexternalhit', 'Twitterbot', 'LinkedInBot'],
-        allow: '/',
-        disallow: ['/api/', '/test-*', '/_next/', '/admin/'],
+        allow: ['/', '/_next/static/'],
+        disallow: ['/api/', '/test-*', '/_next/image/', '/admin/'],
       },
       // Block AI training crawlers and scrapers
       {
@@ -57,8 +57,8 @@ export default function robots(): MetadataRoute.Robots {
       // Default rule for unidentified bots
       {
         userAgent: '*',
-        allow: '/',
-        disallow: ['/api/', '/test-*', '/_next/', '/admin/'],
+        allow: ['/', '/_next/static/'],
+        disallow: ['/api/', '/test-*', '/_next/image/', '/admin/'],
         crawlDelay: 10,
       },
     ],
