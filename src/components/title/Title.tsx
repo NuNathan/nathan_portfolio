@@ -1,6 +1,5 @@
 'use client';
 import "./title.css";
-import CustomButton from "../ui/CustomButton";
 import TrackedCustomButton from "../ui/TrackedCustomButton";
 import Link from 'next/link';
 
@@ -53,7 +52,7 @@ const DivWrapper = ({mouseEnter, mouseLeave, hidden, header, subHeader, resumeUr
       {/* Custom Buttons */}
       <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center relative z-10">
         <Link href="/main/projects" prefetch={true}>
-          <CustomButton
+          <TrackedCustomButton
             type="filled"
             text="Explore My Work"
           />

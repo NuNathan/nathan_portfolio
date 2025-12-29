@@ -59,7 +59,6 @@ export default function TrackedCustomButton({
 
   const filledStyles = `
     rounded-full
-    bg-[linear-gradient(135deg,_#2b61eb_20%,_#8e35ea_100%)]
     text-white
     hover:shadow-lg
     hover:scale-105
@@ -69,10 +68,10 @@ export default function TrackedCustomButton({
   const outlinedStyles = `
     rounded-full
     border-2
-    border-[#2b61eb]
-    text-[#2b61eb]
+    border-[var(--color-dark-blue)]
+    text-[var(--color-dark-blue)]
     bg-transparent
-    hover:bg-[#2b61eb]
+    hover:bg-[var(--color-dark-blue)]
     hover:text-white
     hover:shadow-lg
     hover:scale-105
@@ -113,7 +112,15 @@ export default function TrackedCustomButton({
       // Default box background (same as filled)
       return {
         ...baseStyle,
-        background: 'linear-gradient(135deg, #2b61eb 20%, #8e35ea 100%)',
+        background: 'var(--gradient-primary)',
+      };
+    }
+
+    if (type === 'filled') {
+      // Use gradient from globals.css
+      return {
+        ...baseStyle,
+        background: 'var(--gradient-primary)',
       };
     }
 

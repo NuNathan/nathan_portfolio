@@ -94,7 +94,7 @@ export default async function AboutMe() {
                         <div
                             className="w-64 h-64 sm:w-70 sm:h-70 rounded-3xl overflow-hidden float-animation"
                             style={{
-                                 background: 'linear-gradient(135deg, #2b61eb 30%, #8e35ea)', // border gradient
+                                 background: 'var(--gradient-primary)', // border gradient
     padding: '4px'
                             }}
                         >
@@ -109,7 +109,7 @@ export default async function AboutMe() {
                                         alt={aboutMeData?.headshot?.alternativeText || "Headshot"}
                                     />
                                 ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-6xl font-bold">
+                                    <div className="w-full h-full bg-gradient-primary rounded-3xl flex items-center justify-center text-white text-6xl font-bold">
                                         N
                                     </div>
                                 )}

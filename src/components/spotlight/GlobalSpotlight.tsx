@@ -105,7 +105,7 @@ export default function GlobalSpotlight() {
   // Determine spotlight size and appearance
   const getSpotlightClasses = () => {
     if (hoveringButton) {
-      return "w-[50px] h-[50px] border-[1.5px] border-black bg-[rgba(119,63,234,0.2)]";
+      return "w-[50px] h-[50px] border-[1.5px] border-black bg-[rgba(20,89,82,0.2)]";
     }
     if (hoveringTitle && pathname === '/') {
       return "w-[200px] h-[200px] bg-white mix-blend-overlay ";

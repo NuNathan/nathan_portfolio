@@ -46,10 +46,9 @@ export default function ActionButton({
   // Variant styles with enhanced gradients and hover effects
   const variantStyles = {
     primary: `
-      bg-gradient-to-r from-blue-600 to-purple-600 text-white
-      hover:from-blue-700 hover:to-purple-700
-      hover:shadow-blue-500/25
-      before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent 
+      bg-gradient-primary text-white
+      hover:shadow-lg
+      before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent
       before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100
     `,
     secondary: `

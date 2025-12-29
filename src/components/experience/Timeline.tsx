@@ -125,7 +125,7 @@ export default function Timeline({ data }: TimelineProps) {
   return (
     <div className="relative max-w-6xl mx-auto mb-16">
       {/* Main vertical timeline line - positioned at 200px from left on desktop, 30px on mobile */}
-      <div className="absolute left-[30px] md:left-[200px] top-0 bottom-0 w-1 md:w-2 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 rounded-full"></div>
+      <div className="absolute left-[30px] md:left-[200px] top-0 bottom-0 w-1 md:w-2 bg-gradient-to-b from-[var(--color-light-blue)] to-[var(--color-dark-blue)] via-[var(--color-light-blue)] rounded-full"></div>
 
       {/* Timeline items grouped by year */}
       <div className="space-y-8">
@@ -133,7 +133,7 @@ export default function Timeline({ data }: TimelineProps) {
           <div key={year} className="relative">
             {/* Year marker */}
             <div className="relative flex items-center mb-8">
-              <div className="absolute left-[30px] md:left-[200px] transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-2 md:px-6 md:py-3 rounded-full font-bold text-sm md:text-lg shadow-lg z-20">
+              <div className="absolute left-[30px] md:left-[200px] transform -translate-x-1/2 bg-gradient-primary text-white px-3 py-2 md:px-6 md:py-3 rounded-full font-bold text-sm md:text-lg shadow-lg z-20">
                 {year === new Date().getFullYear() ? 'Present' : year}
               </div>
             </div>
@@ -282,7 +282,7 @@ export default function Timeline({ data }: TimelineProps) {
         {/* Bottom year tag for visual uniformity */}
         <div className="relative">
           <div className="relative flex items-center mb-8">
-            <div className="absolute left-[30px] md:left-[200px] transform -translate-x-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-2 md:px-6 md:py-3 rounded-full font-bold text-sm md:text-lg shadow-lg z-20">
+            <div className="absolute left-[30px] md:left-[200px] transform -translate-x-1/2 bg-gradient-primary text-white px-3 py-2 md:px-6 md:py-3 rounded-full font-bold text-sm md:text-lg shadow-lg z-20">
               {previousYear}
             </div>
           </div>

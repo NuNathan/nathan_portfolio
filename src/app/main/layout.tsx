@@ -18,8 +18,6 @@ export default function MainLayout({
         "/main/blog": "Blog & Insights"
     } as const;
 
-    const colour = "#f8f7fc";
-
     // Get heading based on current route
     const getHeading = () => {
         if (routes[pathname as keyof typeof routes]) {
@@ -35,7 +33,7 @@ export default function MainLayout({
     const heading = getHeading();
 
     return (
-        <div className="relative min-h-screen pt-16" style={{ backgroundColor: colour }}>
+        <div className="relative min-h-screen pt-16 bg-light">
             {heading && (
                 <div className="flex items-center justify-center -mb-8 overflow-visible px-4">
                     <span

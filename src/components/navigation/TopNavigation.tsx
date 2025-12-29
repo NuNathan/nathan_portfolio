@@ -68,9 +68,9 @@ export default function TopNavigation({ className = '' }: TopNavigationProps) {
                       onMouseLeave={() => setActiveItem(null)}
                       className={`px-4 py-2 text-base font-medium rounded-md ${
                         isActive
-                          ? 'text-[#2b61eb] bg-light/60 backdrop-blur-sm'
+                          ? 'text-[var(--color-light-blue)] bg-light/60 backdrop-blur-sm'
                           : activeItem === item.name
-                          ? 'text-gradient-primary bg-light/60 backdrop-blur-sm'
+                          ? 'text-dark-blue bg-light/60 backdrop-blur-sm'
                           : 'text-dark'
                       }`}
                       prefetch={true}
@@ -132,8 +132,8 @@ export default function TopNavigation({ className = '' }: TopNavigationProps) {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`block w-full text-left px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 ${
                     isActive
-                      ? 'text-[#2b61eb] bg-blue-50 border-l-4 border-[#2b61eb]'
-                      : 'text-dark hover:text-[#2b61eb] hover:bg-gray-50 hover:translate-x-1'
+                      ? 'text-[var(--color-light-blue)] bg-light/60 border-l-4 border-[var(--color-light-blue)]'
+                      : 'text-dark hover:text-dark-blue hover:bg-light/40 hover:translate-x-1'
                   }`}
                   prefetch={true}
                 >
