@@ -88,11 +88,11 @@ export function transformImageUrl(url: string | undefined): string {
 // Get OG image from Strapi
 export function getOGImageUrl(imageName: string): string {
   const imageMap: Record<string, string> = {
-    'og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/og_image_997a648fa9.jpg',
-    'projects-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/projects_og_image_e5d2da9ee7.jpg',
-    'about-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/about_og_image_ff561a3243.jpg',
-    'experience-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/experience_og_image_37a1b7d41d.jpg',
-    'blog-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/blog_og_image_b1137d1c40.jpg',
+    'og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/og_image_1_64f9a75edb.jpg',
+    'projects-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/og_image_1_baa82deb4b.jpg',
+    'about-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/about_og_image_c74df545d3.jpg',
+    'experience-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/experience_og_image_25aa6e0927.jpg',
+    'blog-og-image': 'https://positive-life-875d223e2a.media.strapiapp.com/blog_og_image_c3b6e1cd9a.jpg',
   };
 
   return imageMap[imageName] || imageMap['og-image'];
