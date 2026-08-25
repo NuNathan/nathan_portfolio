@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         hostname: 'positive-life-875d223e2a.media.strapiapp.com',
       },
       {
+        protocol: 'https',
+        hostname: 'strapi-lr2l4wdm.binarybridges.ca',
+      },
+      {
         protocol: 'http',
         hostname: 'localhost',
         port: '1339',

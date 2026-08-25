@@ -82,7 +82,10 @@ const STRAPI_MEDIA_URL = process.env.STRAPI_MEDIA_URL;
 // Transform image URLs to use STRAPI_MEDIA_URL
 export function transformImageUrl(url: string | undefined): string {
   if (!url) return '';
-  return url.startsWith('http') ? url : `${STRAPI_MEDIA_URL}${url}`;
+  if (url.startsWith('http')) return url;
+  if (!STRAPI_MEDIA_URL) return url;
+
+  return `${STRAPI_MEDIA_URL.replace(/\/$/, '')}/${url.replace(/^\//, '')}`;
 }
 
 // Get OG image from Strapi
