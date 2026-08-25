@@ -215,7 +215,7 @@ export default function Timeline({ data }: TimelineProps) {
                           </>
                         )}
 
-                        <p className="text-gray-600 text-xs leading-relaxed">{item.description}</p>
+                        <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-line">{item.description}</p>
                       </div>
                     </div>
 
@@ -269,7 +269,7 @@ export default function Timeline({ data }: TimelineProps) {
                           </>
                         )}
 
-                        <p className="text-gray-600 text-xs leading-relaxed">{item.description}</p>
+                        <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-line">{item.description}</p>
                       </div>
                     </div>
                   </div>

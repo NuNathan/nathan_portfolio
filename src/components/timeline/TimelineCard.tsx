@@ -371,7 +371,7 @@ const itemsWithCardsThisMonth = activeItems.filter(item => {
                   </>
                 )}
 
-                <p className="text-gray-600 text-xs leading-relaxed">{item.description}</p>
+                <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-line">{item.description}</p>
               </div>
             </div>
 
@@ -433,7 +433,7 @@ const itemsWithCardsThisMonth = activeItems.filter(item => {
                   </>
                 )}
 
-                <p className="text-gray-600 text-xs leading-relaxed max-w-[240px]">{item.description}</p>
+                <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-line max-w-[240px]">{item.description}</p>
               </div>
             </div>
           </div>
